@@ -622,14 +622,21 @@ const app  = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db   = getFirestore(app);
 
-// ── ADMIN EMAIL — change this to your own email ──
+// ── OWNER EMAIL — has full admin access including danger zone ──
 const ADMIN_EMAIL = 'tonybalony0101@gmail.com';
+
+// ── EDITOR EMAILS — can unlock and edit payroll data ──
+const EDITOR_EMAILS = [
+  'tonybalony0101@gmail.com',
+  'james@terragreenoak.com',
+];
 const PW_KEY = 'tgo_edit_pw';
-const DEFAULT_EDIT_PW = 'admin1234';
+const DEFAULT_EDIT_PW = 'Happy6rocky';
 
 // ── STATE ──
 let currentUser   = null;
 let isAdmin       = false;
+let isOwner       = false;
 let isUnlocked    = false;
 let pwCallback    = null;
 let currentPeriodId = null;
@@ -668,12 +675,14 @@ window.doSignOut = async function() {
 onAuthStateChanged(auth, user => {
   if (user) {
     currentUser = user;
-    isAdmin = user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+    isAdmin = EDITOR_EMAILS.includes(user.email.toLowerCase()); // only editors can unlock
+    isOwner = user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
     document.getElementById('login-screen').classList.add('hidden');
     initApp();
   } else {
     currentUser = null;
     isAdmin = false;
+    isOwner = false;
     isUnlocked = false;
     if (unsubscribe) { unsubscribe(); unsubscribe = null; }
     document.getElementById('login-screen').classList.remove('hidden');
@@ -690,16 +699,16 @@ onAuthStateChanged(auth, user => {
 function initApp() {
   // Update header user chip
   const chipWrap = document.getElementById('user-chip-wrap');
-  chipWrap.innerHTML = `<div class="user-chip ${isAdmin?'admin-chip':'viewer-chip'}">${isAdmin?'Admin':'Viewer'}</div>`;
+  chipWrap.innerHTML = `<div class="user-chip ${isOwner?'admin-chip':isAdmin?'viewer-chip':'viewer-chip'}">${isOwner?'Owner':isAdmin?'Editor':'Viewer'}</div>`;
 
   // Show/hide admin UI
-  document.getElementById('admin-settings').style.display = isAdmin ? '' : 'none';
+  document.getElementById('admin-settings').style.display = isOwner ? '' : 'none';
   document.getElementById('add-worker-btn').style.display = isAdmin ? '' : 'none';
   document.getElementById('lock-badge').style.display = isAdmin ? '' : 'none';
 
   // Settings email/role
   document.getElementById('settings-email').textContent = currentUser.email;
-  document.getElementById('settings-role-text').textContent = isAdmin ? 'Administrator — full access' : 'Viewer — read only access';
+  document.getElementById('settings-role-text').textContent = isOwner ? 'Owner — full access' : isAdmin ? 'Editor — can edit payroll data' : 'Viewer — read only access';
 
   // Start clock
   tickClock();
@@ -1119,7 +1128,7 @@ function refreshSettings() {
   const lockText=document.getElementById('lock-status-text');
   const lockBtn=document.getElementById('settings-lock-btn');
   const danger=document.getElementById('danger-zone-section');
-  if(isAdmin&&isUnlocked){
+  if(isOwner&&isUnlocked){
     lockText.textContent='App is currently unlocked';
     lockBtn.textContent='Lock Now'; lockBtn.className='btn-danger btn-sm';
     if(danger) danger.style.display='';
