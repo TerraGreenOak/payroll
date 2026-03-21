@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="TerraGreenOak">
+<meta name="theme-color" content="#2563eb">
+<title>TerraGreenOak Payroll</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap');
+:root{--bg:#f0f4f8;--surface:#fff;--surface2:#f8fafc;--border:#dde3ec;--accent:#2563eb;--accent2:#0ea5e9;--text:#1e293b;--muted:#64748b;--danger:#ef4444;--success:#059669;--warn:#f59e0b;--radius:10px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;padding-bottom:72px;overflow-x:hidden}
+
+/* ── LOGIN SCREEN ── */
+#login-screen{position:fixed;inset:0;background:linear-gradient(135deg,#eff6ff,#e0f2fe);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:500;padding:24px}
+#login-screen.hidden{display:none}
+.login-logo{font-family:'DM Serif Display',serif;font-size:2rem;color:var(--accent);text-align:center;line-height:1.1;margin-bottom:6px}
+.login-sub{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;text-align:center;margin-bottom:32px}
+.login-card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:28px 24px;width:100%;max-width:360px;box-shadow:0 4px 24px rgba(37,99,235,.08)}
+.login-card h2{font-family:'DM Serif Display',serif;font-size:1.3rem;margin-bottom:4px}
+.login-card p{font-size:.78rem;color:var(--muted);margin-bottom:20px}
+.login-field{margin-bottom:14px}
+.login-label{display:block;font-size:.68rem;font-family:'DM Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.login-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.95rem;padding:11px 14px;transition:border .15s;-webkit-appearance:none}
+.login-input:focus{outline:none;border-color:var(--accent)}
+.login-btn{width:100%;background:var(--accent);color:#fff;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:600;padding:13px;cursor:pointer;transition:background .15s;margin-top:6px}
+.login-btn:hover{background:#1d4ed8}
+.login-btn:disabled{opacity:.5;cursor:not-allowed}
+.login-err{font-size:.75rem;color:var(--danger);margin-top:8px;text-align:center;min-height:18px}
+.login-role-badge{display:inline-flex;align-items:center;gap:5px;font-family:'DM Mono',monospace;font-size:.65rem;padding:3px 8px;border-radius:10px;margin-top:14px;text-align:center;width:100%;justify-content:center}
+.login-role-badge.admin{background:rgba(37,99,235,.1);color:var(--accent);border:1px solid rgba(37,99,235,.2)}
+.login-role-badge.viewer{background:rgba(14,165,233,.1);color:var(--accent2);border:1px solid rgba(14,165,233,.2)}
+
+/* ── SYNC STATUS ── */
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--success);display:inline-block;margin-right:4px}
+.sync-dot.syncing{background:var(--warn);animation:pulse 1s infinite}
+.sync-dot.error{background:var(--danger)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ── HEADER ── */
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 16px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.header-left h1{font-family:'DM Serif Display',serif;font-size:1.35rem;color:var(--accent);letter-spacing:-.02em;line-height:1}
+.header-left p{font-size:.68rem;color:var(--muted);margin-top:2px;font-family:'DM Mono',monospace;letter-spacing:.05em;text-transform:uppercase}
+.header-right{display:flex;gap:7px;align-items:center}
+.clock-display{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted)}
+.lock-badge{display:flex;align-items:center;gap:5px;font-family:'DM Mono',monospace;font-size:.68rem;padding:5px 10px;border-radius:20px;cursor:pointer;border:1px solid var(--border);color:var(--muted);transition:all .15s;user-select:none}
+.lock-badge.unlocked{border-color:var(--accent);color:var(--accent);background:rgba(37,99,235,.08)}
+.lock-badge svg{width:13px;height:13px}
+
+/* ── BUTTONS ── */
+button{font-family:'DM Sans',sans-serif;cursor:pointer;border:none;border-radius:6px;font-size:.8rem;font-weight:500;padding:7px 14px;transition:all .15s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#1d4ed8;transform:translateY(-1px)}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+.btn-danger{background:transparent;color:var(--danger);border:1px solid var(--danger);padding:4px 8px;font-size:.72rem}
+.btn-danger:hover{background:var(--danger);color:#fff}
+.btn-sm{padding:4px 10px;font-size:.75rem}
+
+/* ── MAIN ── */
+main{padding:14px;max-width:900px;margin:0 auto}
+.view{display:none}.view.active{display:block}
+
+/* ── CALENDAR ── */
+.cal-strip{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:14px}
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:8px}
+.cal-month-label{font-family:'DM Serif Display',serif;font-size:1.1rem}
+.cal-live{display:flex;align-items:center;gap:5px;font-family:'DM Mono',monospace;font-size:.68rem;color:var(--accent2)}
+.cal-live-dot{width:7px;height:7px;border-radius:50%;background:var(--accent2);animation:pulse 1.4s infinite}
+.cal-nav-btn{background:transparent;border:1px solid var(--border);color:var(--muted);padding:5px 11px;border-radius:5px;font-size:.85rem}
+.cal-nav-btn:hover{border-color:var(--accent);color:var(--accent)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cal-dow{text-align:center;font-family:'DM Mono',monospace;font-size:.58rem;color:var(--muted);padding-bottom:4px;text-transform:uppercase;letter-spacing:.04em}
+.cal-day{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:5px;font-size:.74rem;font-family:'DM Mono',monospace;border:1px solid transparent;transition:all .1s}
+.cal-day.empty{background:transparent}
+.cal-day.half1{background:rgba(37,99,235,.05);border-color:rgba(37,99,235,.18);color:var(--accent)}
+.cal-day.half2{background:rgba(14,165,233,.05);border-color:rgba(14,165,233,.18);color:var(--accent2)}
+.cal-day.today{background:var(--accent)!important;color:#fff!important;font-weight:700;border-color:var(--accent)!important}
+.cal-period-bar{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.cal-period-chip{display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-family:'DM Mono',monospace;font-size:.72rem;border:1px solid var(--border);background:var(--surface2);color:var(--muted);cursor:pointer;transition:all .15s}
+.cal-period-chip.chip-h1{border-color:rgba(37,99,235,.35);color:var(--accent);background:rgba(37,99,235,.08)}
+.cal-period-chip.chip-h2{border-color:rgba(14,165,233,.35);color:var(--accent2);background:rgba(14,165,233,.07)}
+.chip-dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
+.badge-now{font-size:.6rem;background:rgba(14,165,233,.12);border:1px solid rgba(14,165,233,.3);color:var(--accent2);padding:1px 6px;border-radius:8px;margin-left:2px}
+
+/* ── PERIOD BAR ── */
+.period-bar{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.period-bar label{font-size:.7rem;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.05em}
+select{background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:7px 12px;font-family:'DM Mono',monospace;font-size:.8rem;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;min-width:180px}
+select:focus{outline:1px solid var(--accent)}
+
+/* ── SUMMARY ── */
+.summary-card{background:linear-gradient(135deg,#eff6ff,#e0f2fe);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--radius);padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.summary-period{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--accent);text-transform:uppercase;letter-spacing:.08em}
+.summary-total{font-family:'DM Serif Display',serif;font-size:2rem;color:var(--accent);line-height:1}
+.summary-label{font-size:.68rem;color:var(--muted);margin-top:2px}
+.summary-badge{font-family:'DM Mono',monospace;font-size:.65rem;padding:3px 8px;border-radius:10px;background:rgba(14,165,233,.1);border:1px solid rgba(14,165,233,.3);color:var(--accent2);margin-top:4px;display:inline-block}
+.period-status{display:inline-flex;align-items:center;gap:5px;font-family:'DM Mono',monospace;font-size:.62rem;padding:3px 8px;border-radius:10px;border:1px solid var(--border);color:var(--muted);margin-top:5px}
+.period-status.active{border-color:var(--accent2);color:var(--accent2);background:rgba(14,165,233,.08)}
+.period-status.future{border-color:var(--warn);color:var(--warn);background:rgba(245,158,11,.08)}
+.sdot{width:5px;height:5px;border-radius:50%;background:currentColor}
+
+/* ── WORKERS ── */
+.workers-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:14px}
+.workers-section-header{padding:11px 15px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px}
+.section-title{font-size:.68rem;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.worker-row{border-bottom:1px solid var(--border);padding:12px 15px;transition:background .1s}
+.worker-row:last-child{border-bottom:none}
+.worker-row:hover{background:var(--surface2)}
+.worker-row-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.worker-name-input{background:transparent;border:none;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:600;width:100%;max-width:200px;padding:3px 6px;border-radius:4px;border:1px solid transparent;transition:border .15s}
+.worker-name-input:focus{outline:none;border-color:var(--accent);background:var(--surface2)}
+.worker-name-input[readonly]{cursor:default}
+.worker-total{font-family:'DM Mono',monospace;font-size:.95rem;font-weight:500;color:var(--success);white-space:nowrap}
+.worker-fields{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+@media(max-width:500px){.worker-fields{grid-template-columns:repeat(2,1fr)}}
+.field-group{display:flex;flex-direction:column;gap:3px}
+.field-label{font-size:.6rem;font-family:'DM Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.field-input{background:var(--surface2);border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:'DM Mono',monospace;font-size:.82rem;padding:6px 8px;width:100%;transition:border .15s}
+.field-input:focus{outline:none;border-color:var(--accent)}
+.field-input[readonly]{cursor:default;opacity:.65}
+.worker-row-bottom{display:flex;align-items:center;justify-content:flex-end;margin-top:8px}
+.section-empty{padding:20px 15px;color:var(--muted);font-size:.82rem;text-align:center}
+
+/* ── HISTORY ── */
+.history-view{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.history-row{display:flex;align-items:center;padding:12px 15px;border-bottom:1px solid var(--border);gap:10px;flex-wrap:wrap;cursor:pointer;transition:background .1s}
+.history-row:last-child{border-bottom:none}
+.history-row:hover{background:var(--surface2)}
+.history-period{font-family:'DM Mono',monospace;font-size:.78rem;color:var(--accent2);flex:1;min-width:110px}
+.history-total{font-family:'DM Serif Display',serif;font-size:1.1rem;color:var(--success)}
+.history-workers{font-size:.7rem;color:var(--muted)}
+
+/* ── MODALS ── */
+.modal-backdrop{display:none;position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:200;align-items:center;justify-content:center;padding:20px}
+.modal-backdrop.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;width:100%;max-width:400px;animation:su .2s ease}
+@keyframes su{from{transform:translateY(18px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal h2{font-family:'DM Serif Display',serif;font-size:1.25rem;margin-bottom:3px}
+.modal .sub{color:var(--muted);font-size:.78rem;margin-bottom:18px}
+.form-field{margin-bottom:12px}
+.form-label{display:block;font-size:.68rem;font-family:'DM Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.form-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.9rem;padding:9px 12px;transition:border .15s}
+.form-input:focus{outline:none;border-color:var(--accent)}
+.form-input.shake{animation:shk .3s ease;border-color:var(--danger)}
+@keyframes shk{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.modal-actions{display:flex;gap:8px;margin-top:18px;justify-content:flex-end}
+.err-hint{font-size:.68rem;color:var(--danger);margin-top:4px;display:none}
+.err-hint.show{display:block}
+.pw-wrap{position:relative}
+.pw-eye{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);padding:4px;cursor:pointer;font-family:'DM Mono',monospace;font-size:.7rem}
+
+/* ── SETTINGS ── */
+.settings-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:16px}
+.settings-section-title{padding:12px 16px;border-bottom:1px solid var(--border);font-family:'DM Mono',monospace;font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.settings-row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);gap:12px;flex-wrap:wrap}
+.settings-row:last-child{border-bottom:none}
+.settings-row-title{font-size:.9rem;font-weight:600;margin-bottom:2px}
+.settings-row-sub{font-size:.72rem;color:var(--muted)}
+.settings-row-right{flex-shrink:0}
+.settings-page-title{font-family:'DM Serif Display',serif;font-size:1.5rem;margin-bottom:4px}
+.settings-page-sub{font-size:.78rem;color:var(--muted);margin-bottom:18px}
+.danger-zone{border-color:rgba(239,68,68,.3)}
+.danger-zone .settings-section-title{color:var(--danger)}
+
+/* ── EXPORT ── */
+.export-option{border:1px solid var(--border);border-radius:8px;padding:14px;cursor:pointer;transition:all .15s;margin-bottom:10px;display:flex;align-items:flex-start;gap:12px}
+.export-option:hover{border-color:var(--accent);background:rgba(37,99,235,.04)}
+.export-option.selected{border-color:var(--accent);background:rgba(37,99,235,.08)}
+.export-option-icon{width:36px;height:36px;border-radius:8px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.export-option-icon svg{width:18px;height:18px;color:var(--accent)}
+.export-option-title{font-weight:600;font-size:.88rem;margin-bottom:3px}
+.export-option-sub{font-size:.72rem;color:var(--muted)}
+.export-radio{width:16px;height:16px;accent-color:var(--accent);flex-shrink:0;margin-top:2px}
+.pw-strength{height:3px;border-radius:2px;margin-top:6px;transition:all .3s;background:var(--border)}
+.pw-strength.weak{background:var(--danger);width:33%}
+.pw-strength.medium{background:var(--warn);width:66%}
+.pw-strength.strong{background:var(--success);width:100%}
+.pw-strength-label{font-size:.62rem;font-family:'DM Mono',monospace;color:var(--muted);margin-top:3px}
+
+/* ── USER CHIP ── */
+.user-chip{display:flex;align-items:center;gap:5px;font-family:'DM Mono',monospace;font-size:.65rem;padding:4px 9px;border-radius:12px;border:1px solid var(--border);color:var(--muted)}
+.user-chip.admin-chip{border-color:rgba(37,99,235,.3);color:var(--accent);background:rgba(37,99,235,.06)}
+.user-chip.viewer-chip{border-color:rgba(14,165,233,.3);color:var(--accent2);background:rgba(14,165,233,.06)}
+
+/* ── NAV ── */
+.nav-bottom{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:100}
+.nav-btn{flex:1;padding:10px 8px 13px;display:flex;flex-direction:column;align-items:center;gap:3px;background:transparent;border:none;color:var(--muted);font-size:.58rem;font-family:'DM Mono',monospace;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;transition:color .15s;border-radius:0}
+.nav-btn svg{width:19px;height:19px}
+.nav-btn.active{color:var(--accent)}
+
+/* ── LOADING SPINNER ── */
+.spinner{display:inline-block;width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-overlay{position:fixed;inset:0;background:rgba(240,244,248,.85);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:300;font-family:'DM Mono',monospace;font-size:.78rem;color:var(--muted)}
+.loading-overlay.hidden{display:none}
+</style>
+</head>
+<body>
+
+<!-- ── LOGIN SCREEN ── -->
+<div id="login-screen">
+  <div class="login-logo">TerraGreenOak</div>
+  <div class="login-sub">Payroll System</div>
+  <div class="login-card">
+    <h2>Sign In</h2>
+    <p>Enter your company credentials to access payroll data.</p>
+    <div class="login-field">
+      <label class="login-label">Email</label>
+      <input class="login-input" id="login-email" type="email" placeholder="you@company.com" autocomplete="email"/>
+    </div>
+    <div class="login-field">
+      <label class="login-label">Password</label>
+      <input class="login-input" id="login-password" type="password" placeholder="••••••••" autocomplete="current-password"
+        onkeydown="if(event.key==='Enter')doLogin()"/>
+    </div>
+    <button class="login-btn" id="login-btn" onclick="doLogin()">Sign In</button>
+    <div class="login-err" id="login-err"></div>
+  </div>
+</div>
+
+<!-- ── LOADING ── -->
+<div class="loading-overlay" id="loading-overlay">
+  <div class="spinner"></div>
+  <span id="loading-msg">Loading payroll data…</span>
+</div>
+
+<!-- ── HEADER ── -->
+<header>
+  <div class="header-left">
+    <h1>TerraGreenOak</h1>
+    <p>Payroll</p>
+  </div>
+  <div class="header-right">
+    <div class="clock-display" id="live-clock"></div>
+    <div id="user-chip-wrap"></div>
+    <div class="lock-badge" id="lock-badge" onclick="toggleLock()">
+      <svg id="lock-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <rect x="3" y="11" width="18" height="11" rx="2"/>
+        <path d="M7 11V7a5 5 0 0110 0v4"/>
+      </svg>
+      <span id="lock-label">Locked</span>
+    </div>
+    <button class="btn-primary btn-sm" onclick="openExportModal()">Export</button>
+  </div>
+</header>
+
+<main>
+  <!-- CURRENT VIEW -->
+  <div class="view active" id="view-current">
+    <!-- Sync status bar -->
+    <div id="sync-bar" style="display:flex;align-items:center;gap:6px;font-family:'DM Mono',monospace;font-size:.65rem;color:var(--muted);margin-bottom:10px;padding:6px 12px;background:var(--surface);border:1px solid var(--border);border-radius:8px">
+      <span class="sync-dot" id="sync-dot"></span>
+      <span id="sync-msg">Connected · Live sync active</span>
+    </div>
+
+    <div class="cal-strip">
+      <div class="cal-header">
+        <button class="cal-nav-btn" onclick="calNav(-1)">&#8249;</button>
+        <div>
+          <div class="cal-month-label" id="cal-month-label"></div>
+          <div class="cal-live"><span class="cal-live-dot"></span><span id="cal-date-label"></span></div>
+        </div>
+        <button class="cal-nav-btn" onclick="calNav(1)">&#8250;</button>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+      <div class="cal-period-bar" id="cal-period-bar"></div>
+    </div>
+
+    <div class="period-bar">
+      <label>Period:</label>
+      <select id="period-select" onchange="loadPeriod(this.value)"></select>
+    </div>
+
+    <div class="summary-card">
+      <div>
+        <div class="summary-period" id="sum-label"></div>
+        <div class="summary-label">Bi-Monthly Total</div>
+        <div id="sum-status"></div>
+      </div>
+      <div style="text-align:right">
+        <div class="summary-total" id="sum-total">$0</div>
+        <div class="summary-label" id="sum-workers"></div>
+        <div class="summary-badge" id="sum-days" style="display:none"></div>
+      </div>
+    </div>
+
+    <div class="workers-section">
+      <div class="workers-section-header">
+        <span class="section-title">Workers</span>
+        <button class="btn-primary btn-sm" id="add-worker-btn" onclick="addWorker()" style="display:none">+ Add Worker</button>
+      </div>
+      <div id="workers-list"><div class="section-empty">Loading…</div></div>
+    </div>
+  </div>
+
+  <!-- HISTORY VIEW -->
+  <div class="view" id="view-history">
+    <div style="margin-bottom:14px">
+      <h2 style="font-family:'DM Serif Display',serif;font-size:1.3rem">Pay History</h2>
+    </div>
+    <div style="background:linear-gradient(135deg,#eff6ff,#e0f2fe);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--radius);padding:14px 18px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+      <div>
+        <div style="font-family:'DM Mono',monospace;font-size:.68rem;color:var(--accent);text-transform:uppercase;letter-spacing:.08em">All-Time Payroll</div>
+        <div style="font-size:.72rem;color:var(--muted);margin-top:2px" id="history-period-range"></div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-family:'DM Serif Display',serif;font-size:2rem;color:var(--accent);line-height:1" id="history-alltime-total">$0</div>
+        <div style="font-size:.68rem;color:var(--muted);margin-top:2px" id="history-period-count"></div>
+      </div>
+    </div>
+    <div class="history-view" id="history-list"></div>
+  </div>
+
+  <!-- SETTINGS VIEW -->
+  <div class="view" id="view-settings">
+    <p class="settings-page-title">Settings</p>
+    <p class="settings-page-sub">Manage your account, security, and data.</p>
+
+    <div class="settings-section">
+      <div class="settings-section-title">👤 Account</div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-title" id="settings-email">—</div>
+          <div class="settings-row-sub" id="settings-role-text">—</div>
+        </div>
+        <div class="settings-row-right">
+          <button class="btn-ghost btn-sm" onclick="doSignOut()">Sign Out</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-section" id="admin-settings" style="display:none">
+      <div class="settings-section-title">🔐 Security</div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-title">Edit Lock</div>
+          <div class="settings-row-sub" id="lock-status-text">App is currently locked</div>
+        </div>
+        <div class="settings-row-right">
+          <button class="btn-ghost btn-sm" id="settings-lock-btn" onclick="settingsToggleLock()">Unlock</button>
+        </div>
+      </div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-title">Admin Password</div>
+          <div class="settings-row-sub">Required to edit worker data</div>
+        </div>
+        <div class="settings-row-right">
+          <button class="btn-ghost btn-sm" onclick="openChangePassword()">Change</button>
+        </div>
+      </div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-title">Manage Users</div>
+          <div class="settings-row-sub">Add employee accounts in Firebase Console</div>
+        </div>
+        <div class="settings-row-right">
+          <a href="https://console.firebase.google.com/project/terragreenoak-payroll/authentication/users" target="_blank" style="font-size:.75rem;color:var(--accent);text-decoration:none;font-family:'DM Mono',monospace">Open Console →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">📤 Export Data</div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-title">Export Payroll</div>
+          <div class="settings-row-sub">CSV or PDF, current period or all history</div>
+        </div>
+        <div class="settings-row-right">
+          <button class="btn-primary btn-sm" onclick="openExportModal()">Export…</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">ℹ️ About</div>
+      <div class="settings-row">
+        <div class="settings-row-title">Total Periods</div>
+        <div class="settings-row-sub" id="settings-period-count">—</div>
+      </div>
+      <div class="settings-row">
+        <div class="settings-row-title">All-Time Total</div>
+        <div class="settings-row-sub" id="settings-alltime-total">—</div>
+      </div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-title">Data Storage</div>
+          <div class="settings-row-sub">Firebase Firestore · Real-time cloud sync</div>
+        </div>
+        <div class="settings-row-right">
+          <span style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--success)">● Cloud</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-section danger-zone" id="danger-zone-section" style="display:none">
+      <div class="settings-section-title">⚠ Danger Zone</div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-title">Clear All Data</div>
+          <div class="settings-row-sub">Permanently delete all periods from the cloud</div>
+        </div>
+        <div class="settings-row-right">
+          <button class="btn-danger" onclick="confirmClearAll()">Clear All</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- BOTTOM NAV -->
+<nav class="nav-bottom">
+  <button class="nav-btn active" id="nav-current" onclick="showView('current')">
+    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    Current
+  </button>
+  <button class="nav-btn" id="nav-history" onclick="showView('history')">
+    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    History
+  </button>
+  <button class="nav-btn" id="nav-settings" onclick="showView('settings')">
+    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+    Settings
+  </button>
+</nav>
+
+<!-- ── MODALS ── -->
+
+<!-- Admin Lock Password -->
+<div class="modal-backdrop" id="modal-pw">
+  <div class="modal">
+    <h2>Admin Password</h2>
+    <p class="sub">Enter your password to enable editing.</p>
+    <div class="form-field">
+      <label class="form-label">Password</label>
+      <div class="pw-wrap">
+        <input class="form-input" id="pw-input" type="password" placeholder="••••••••"
+          onkeydown="if(event.key==='Enter')submitPw()" autocomplete="off"/>
+        <button class="pw-eye" onclick="togglePwEye('pw-input',this)">show</button>
+      </div>
+      <div class="err-hint" id="pw-err">Incorrect password.</div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeModal('modal-pw')">Cancel</button>
+      <button class="btn-primary" onclick="submitPw()">Unlock</button>
+    </div>
+  </div>
+</div>
+
+<!-- Change Password -->
+<div class="modal-backdrop" id="modal-change-pw">
+  <div class="modal">
+    <h2>Change Password</h2>
+    <p class="sub">Enter your current password first.</p>
+    <div class="form-field">
+      <label class="form-label">Current Password</label>
+      <div class="pw-wrap">
+        <input class="form-input" id="cpw-current" type="password" placeholder="Current password"/>
+        <button class="pw-eye" onclick="togglePwEye('cpw-current',this)">show</button>
+      </div>
+      <div class="err-hint" id="cpw-current-err">Incorrect current password.</div>
+    </div>
+    <div class="form-field">
+      <label class="form-label">New Password</label>
+      <div class="pw-wrap">
+        <input class="form-input" id="cpw-new" type="password" placeholder="New password" oninput="checkPwStrength(this.value)"/>
+        <button class="pw-eye" onclick="togglePwEye('cpw-new',this)">show</button>
+      </div>
+      <div class="pw-strength" id="pw-strength-bar"></div>
+      <div class="pw-strength-label" id="pw-strength-label"></div>
+    </div>
+    <div class="form-field">
+      <label class="form-label">Confirm New Password</label>
+      <div class="pw-wrap">
+        <input class="form-input" id="cpw-confirm" type="password" placeholder="Repeat new password"
+          onkeydown="if(event.key==='Enter')submitChangePw()"/>
+        <button class="pw-eye" onclick="togglePwEye('cpw-confirm',this)">show</button>
+      </div>
+      <div class="err-hint" id="cpw-match-err">Passwords do not match.</div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeModal('modal-change-pw')">Cancel</button>
+      <button class="btn-primary" onclick="submitChangePw()">Update Password</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Worker -->
+<div class="modal-backdrop" id="modal-worker">
+  <div class="modal">
+    <h2>Add Worker</h2>
+    <p class="sub">Carries over to future periods with days reset to zero.</p>
+    <div class="form-field"><label class="form-label">Name</label><input class="form-input" id="nw-name" placeholder="e.g. Moises #1"/></div>
+    <div class="form-field"><label class="form-label">Daily Rate ($)</label><input class="form-input" id="nw-rate" type="number" placeholder="180" min="0"/></div>
+    <div class="form-field"><label class="form-label">Days Worked</label><input class="form-input" id="nw-days" type="number" placeholder="0" min="0" step="0.5"/></div>
+    <div class="form-field"><label class="form-label">Days Off</label><input class="form-input" id="nw-off" type="number" placeholder="0" min="0" step="0.5"/></div>
+    <div class="form-field"><label class="form-label">Bonus ($)</label><input class="form-input" id="nw-bonus" type="number" placeholder="0" min="0"/></div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeModal('modal-worker')">Cancel</button>
+      <button class="btn-primary" onclick="saveNewWorker()">Add Worker</button>
+    </div>
+  </div>
+</div>
+
+<!-- Export Modal -->
+<div class="modal-backdrop" id="modal-export">
+  <div class="modal">
+    <h2>Export Data</h2>
+    <p class="sub">Choose what to include and your preferred format.</p>
+    <div class="export-option selected" id="export-opt-current" onclick="selectExport('current')">
+      <input type="radio" class="export-radio" name="export-scope" checked/>
+      <div class="export-option-icon"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>
+      <div><div class="export-option-title">Current Period</div><div class="export-option-sub" id="export-current-label">Export the selected period</div></div>
+    </div>
+    <div class="export-option" id="export-opt-choose" onclick="selectExport('choose')">
+      <input type="radio" class="export-radio" name="export-scope"/>
+      <div class="export-option-icon"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
+      <div><div class="export-option-title">Choose Periods</div><div class="export-option-sub" id="export-choose-label">Pick specific periods</div></div>
+    </div>
+    <div id="export-period-list" style="display:none;margin-top:8px;border:1px solid var(--border);border-radius:8px;overflow:hidden">
+      <div style="padding:7px 12px;background:var(--surface2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+        <span style="font-family:'DM Mono',monospace;font-size:.63rem;color:var(--muted);text-transform:uppercase" id="export-check-count">0 selected</span>
+        <div style="display:flex;gap:12px">
+          <span style="font-family:'DM Mono',monospace;font-size:.68rem;color:var(--accent);cursor:pointer;font-weight:600" onclick="checkAllPeriods(true)">All</span>
+          <span style="font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);cursor:pointer" onclick="checkAllPeriods(false)">None</span>
+        </div>
+      </div>
+      <div id="export-period-checks" style="max-height:160px;overflow-y:auto"></div>
+    </div>
+    <div class="export-option" id="export-opt-all" onclick="selectExport('all')" style="margin-top:8px">
+      <input type="radio" class="export-radio" name="export-scope"/>
+      <div class="export-option-icon"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+      <div><div class="export-option-title">All Historical Data</div><div class="export-option-sub" id="export-all-label">Every period ever recorded</div></div>
+    </div>
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+      <div class="form-label" style="margin-bottom:8px">Format</div>
+      <div style="display:flex;gap:8px">
+        <div id="fmt-csv" onclick="selectFormat('csv')" style="flex:1;border:1px solid var(--accent);border-radius:7px;padding:9px 12px;cursor:pointer;background:rgba(37,99,235,.07);text-align:center">
+          <div style="font-weight:600;font-size:.85rem;color:var(--accent)">CSV</div>
+          <div style="font-size:.68rem;color:var(--muted);margin-top:2px">Spreadsheet</div>
+        </div>
+        <div id="fmt-pdf" onclick="selectFormat('pdf')" style="flex:1;border:1px solid var(--border);border-radius:7px;padding:9px 12px;cursor:pointer;background:var(--surface2);text-align:center">
+          <div style="font-weight:600;font-size:.85rem;color:var(--muted)">PDF</div>
+          <div style="font-size:.68rem;color:var(--muted);margin-top:2px">Print-ready</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeModal('modal-export')">Cancel</button>
+      <button class="btn-primary" id="export-download-btn" onclick="doExport()">Download CSV</button>
+    </div>
+  </div>
+</div>
+
+<!-- Clear All: Step 1 -->
+<div class="modal-backdrop" id="modal-clear-step1">
+  <div class="modal">
+    <h2 style="color:var(--danger)">⚠️ Delete All Data?</h2>
+    <p class="sub">This will permanently erase every pay period and worker record from the cloud. <strong>Cannot be undone.</strong></p>
+    <div style="background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:12px 14px">
+      <div style="font-size:.82rem;color:var(--danger);font-weight:600;margin-bottom:4px">You are about to delete:</div>
+      <div style="font-size:.78rem;color:var(--text)" id="clear-summary">All periods and worker records</div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeModal('modal-clear-step1')">Cancel</button>
+      <button class="btn-danger" onclick="clearStep2()">Yes, Continue →</button>
+    </div>
+  </div>
+</div>
+<!-- Clear All: Step 2 -->
+<div class="modal-backdrop" id="modal-clear-step2">
+  <div class="modal">
+    <h2 style="color:var(--danger)">Are You Certain?</h2>
+    <p class="sub">There is no backup. This data will be gone from the cloud forever.</p>
+    <div style="background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:12px 14px;font-size:.82rem;color:var(--danger)">❌ All pay history will be permanently lost.</div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeModal('modal-clear-step2')">Go Back</button>
+      <button class="btn-danger" onclick="clearStep3()">I Understand →</button>
+    </div>
+  </div>
+</div>
+<!-- Clear All: Step 3 -->
+<div class="modal-backdrop" id="modal-clear-step3">
+  <div class="modal">
+    <h2 style="color:var(--danger)">Final Confirmation</h2>
+    <p class="sub">Type <strong style="font-family:'DM Mono',monospace;color:var(--danger)">DELETE</strong> to confirm.</p>
+    <div class="form-field">
+      <input class="form-input" id="clear-confirm-input" placeholder="Type DELETE to confirm"
+        oninput="document.getElementById('clear-exec-btn').disabled = this.value !== 'DELETE'"
+        onkeydown="if(event.key==='Enter'&&this.value==='DELETE')executeClearAll()"/>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeModal('modal-clear-step3');document.getElementById('clear-confirm-input').value='';document.getElementById('clear-exec-btn').disabled=true">Cancel</button>
+      <button class="btn-danger" id="clear-exec-btn" disabled onclick="executeClearAll()">Delete Everything</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- FIREBASE SDK -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, onSnapshot, writeBatch, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+// ── FIREBASE CONFIG ──
+const firebaseConfig = {
+  apiKey: "AIzaSyC5I95ekBxk0W54zuIg8kNzchOi10Io7as",
+  authDomain: "terragreenoak-payroll.firebaseapp.com",
+  projectId: "terragreenoak-payroll",
+  storageBucket: "terragreenoak-payroll.firebasestorage.app",
+  messagingSenderId: "577922081191",
+  appId: "1:577922081191:web:3194bf5dd2220f12cbd682"
+};
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+// ── ADMIN EMAIL — change this to your own email ──
+const ADMIN_EMAIL = 'tonybalony0101@gmail.com';
+const PW_KEY = 'tgo_edit_pw';
+const DEFAULT_EDIT_PW = 'admin1234';
+
+// ── STATE ──
+let currentUser   = null;
+let isAdmin       = false;
+let isUnlocked    = false;
+let pwCallback    = null;
+let currentPeriodId = null;
+let periods       = [];   // local mirror of Firestore data
+let unsubscribe   = null; // live listener
+let calBase       = new Date();
+let exportScope   = 'current';
+let exportFormat  = 'csv';
+
+// ════════════════════════════════════
+// AUTH
+// ════════════════════════════════════
+window.doLogin = async function() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass  = document.getElementById('login-password').value;
+  const btn   = document.getElementById('login-btn');
+  const err   = document.getElementById('login-err');
+  err.textContent = '';
+  btn.disabled = true;
+  btn.textContent = 'Signing in…';
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+  } catch(e) {
+    err.textContent = e.code === 'auth/invalid-credential' || e.code === 'auth/wrong-password'
+      ? 'Incorrect email or password.' : 'Sign in failed. Check your connection.';
+    btn.disabled = false;
+    btn.textContent = 'Sign In';
+  }
+};
+
+window.doSignOut = async function() {
+  if (unsubscribe) unsubscribe();
+  await signOut(auth);
+};
+
+onAuthStateChanged(auth, user => {
+  if (user) {
+    currentUser = user;
+    isAdmin = user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+    document.getElementById('login-screen').classList.add('hidden');
+    initApp();
+  } else {
+    currentUser = null;
+    isAdmin = false;
+    isUnlocked = false;
+    if (unsubscribe) { unsubscribe(); unsubscribe = null; }
+    document.getElementById('login-screen').classList.remove('hidden');
+    document.getElementById('login-btn').disabled = false;
+    document.getElementById('login-btn').textContent = 'Sign In';
+    document.getElementById('login-err').textContent = '';
+    document.getElementById('login-password').value = '';
+  }
+});
+
+// ════════════════════════════════════
+// APP INIT
+// ════════════════════════════════════
+function initApp() {
+  // Update header user chip
+  const chipWrap = document.getElementById('user-chip-wrap');
+  chipWrap.innerHTML = `<div class="user-chip ${isAdmin?'admin-chip':'viewer-chip'}">${isAdmin?'Admin':'Viewer'}</div>`;
+
+  // Show/hide admin UI
+  document.getElementById('admin-settings').style.display = isAdmin ? '' : 'none';
+  document.getElementById('add-worker-btn').style.display = isAdmin ? '' : 'none';
+  document.getElementById('lock-badge').style.display = isAdmin ? '' : 'none';
+
+  // Settings email/role
+  document.getElementById('settings-email').textContent = currentUser.email;
+  document.getElementById('settings-role-text').textContent = isAdmin ? 'Administrator — full access' : 'Viewer — read only access';
+
+  // Start clock
+  tickClock();
+  setInterval(tickClock, 1000);
+
+  // Calendar
+  renderCal();
+
+  // Start live Firestore listener
+  startListener();
+}
+
+// ════════════════════════════════════
+// FIRESTORE LIVE LISTENER
+// ════════════════════════════════════
+function startListener() {
+  showLoading('Connecting to cloud…');
+  setSyncStatus('syncing', 'Connecting…');
+
+  const periodsCol = collection(db, 'periods');
+  unsubscribe = onSnapshot(
+    query(periodsCol, orderBy('id')),
+    snapshot => {
+      periods = [];
+      snapshot.forEach(docSnap => {
+        periods.push({ firestoreId: docSnap.id, ...docSnap.data() });
+      });
+      periods.sort((a,b) => a.id.localeCompare(b.id));
+      hideLoading();
+      setSyncStatus('ok', 'Connected · Live sync active');
+      onPeriodsLoaded();
+    },
+    error => {
+      console.error('Firestore error:', error);
+      setSyncStatus('error', 'Connection error — retrying');
+      hideLoading();
+    }
+  );
+}
+
+function setSyncStatus(state, msg) {
+  const dot = document.getElementById('sync-dot');
+  const txt = document.getElementById('sync-msg');
+  dot.className = 'sync-dot' + (state==='syncing'?' syncing': state==='error'?' error':'');
+  txt.textContent = msg;
+}
+
+async function onPeriodsLoaded() {
+  // Seed historical data if Firestore is empty
+  if (periods.length === 0) {
+    await seedHistoricalData();
+    return; // listener will fire again after seed
+  }
+  await ensureCurrentPeriod();
+  renderPeriodSelect();
+  renderHistoryList();
+
+  // Load current period
+  const tm = todayMeta();
+  const cur = periods.find(p=>p.id===tm.id) || periods[periods.length-1];
+  if (cur) {
+    currentPeriodId = cur.id;
+    document.getElementById('period-select').value = cur.id;
+    loadPeriod(cur.id);
+  }
+}
+
+// ════════════════════════════════════
+// PERIOD MATH
+// ════════════════════════════════════
+function periodMeta(d) {
+  const y=d.getFullYear(), m=d.getMonth(), day=d.getDate();
+  const dim=new Date(y,m+1,0).getDate();
+  const mm=String(m+1).padStart(2,'0'), yy=String(y).slice(2);
+  if(day<=15) return {id:`${yy}${mm}a`, label:`${m+1}/1-${m+1}/15/${yy}`, start:new Date(y,m,1), end:new Date(y,m,15)};
+  return {id:`${yy}${mm}b`, label:`${m+1}/16-${m+1}/${dim}/${yy}`, start:new Date(y,m,16), end:new Date(y,m,dim)};
+}
+function todayMeta() { return periodMeta(new Date()); }
+function calcW(w) { return Math.round(w.days*w.rate - w.daysOff*w.rate + (w.bonus||0)); }
+function calcP(p) { return (p.workers||[]).reduce((s,w)=>s+calcW(w),0); }
+function fmt(n)   { return '$'+n.toLocaleString(); }
+function esc(s)   { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function uid()    { return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+
+// ════════════════════════════════════
+// FIRESTORE WRITE HELPERS
+// ════════════════════════════════════
+async function savePeriod(period) {
+  const ref = doc(db, 'periods', period.id);
+  const {firestoreId, ...data} = period;
+  await setDoc(ref, data, {merge:true});
+}
+
+async function ensureCurrentPeriod() {
+  const tm = todayMeta();
+  if (periods.find(p=>p.id===tm.id)) return;
+  const last = periods[periods.length-1];
+  const workers = last && last.workers && last.workers.length
+    ? last.workers.map(w=>({id:uid(), name:w.name, rate:w.rate, days:0, daysOff:0, bonus:0}))
+    : [];
+  const newPeriod = {id:tm.id, label:tm.label, workers};
+  await savePeriod(newPeriod);
+}
+
+// ════════════════════════════════════
+// SEED HISTORICAL DATA
+// ════════════════════════════════════
+async function seedHistoricalData() {
+  showLoading('Uploading historical data…');
+  const hist = [
+    {id:'2505a',label:'5/1-5/15/25',   w:[{n:'Moises #1',r:195,d:13,o:0,b:0},{n:'Vinicio #2',r:180,d:13,o:0,b:0},{n:'Carlos #3',r:180,d:3,o:0,b:0},{n:'Little Diego #4',r:180,d:1,o:0,b:0},{n:'Shing',r:230,d:13,o:1,b:10}]},
+    {id:'2505b',label:'5/16-5/31/25',  w:[{n:'[81]',r:192,d:14,o:0,b:0},{n:'Moises #1',r:203,d:15,o:0,b:0},{n:'Vinicio #2',r:185,d:15,o:0,b:0},{n:'Carlos #3',r:180,d:14,o:0,b:0},{n:'Little Diego #4',r:180,d:14,o:0,b:0}]},
+    {id:'2506a',label:'6/1-6/15/25',   w:[{n:'[81]',r:192,d:12,o:0,b:0},{n:'Moises #1',r:203,d:13.5,o:0,b:0},{n:'Vinicio #2',r:185,d:13.5,o:0,b:0},{n:'Carlos #3',r:180,d:12,o:1,b:0},{n:'Little Diego #4',r:180,d:12,o:0,b:0}]},
+    {id:'2506b',label:'6/16-6/30/25',  w:[{n:'[81]',r:192,d:13,o:0,b:0},{n:'Moises #1',r:203,d:14.5,o:0,b:0},{n:'Vinicio #2',r:185,d:14.5,o:0,b:0},{n:'Carlos #3',r:180,d:13,o:0,b:0},{n:'Little Diego #4',r:180,d:13,o:0,b:0}]},
+    {id:'2507a',label:'7/1-7/15/25',   w:[{n:'[81]',r:192,d:13,o:0,b:0},{n:'Moises #1',r:203,d:15,o:0,b:0},{n:'Vinicio #2',r:185,d:15,o:0,b:0},{n:'Carlos #3',r:180,d:15,o:0,b:0},{n:'Little Diego #4',r:180,d:15,o:0,b:0}]},
+    {id:'2507b',label:'7/16-7/31/25',  w:[{n:'[81]',r:192,d:13,o:1,b:0},{n:'Moises #1',r:203,d:16,o:0,b:0},{n:'Vinicio #2',r:185,d:16,o:0,b:0},{n:'Carlos #3',r:180,d:16,o:0,b:0},{n:'Little Diego #4',r:180,d:16,o:0,b:0},{n:'New guy #5',r:180,d:17,o:0,b:0}]},
+    {id:'2508a',label:'8/1-8/15/25',   w:[{n:'[81]',r:192,d:13,o:0,b:0},{n:'Moises #1',r:203,d:15,o:0,b:0},{n:'Vinicio #2',r:185,d:15,o:0,b:0},{n:'Carlos #3',r:180,d:15,o:0,b:0},{n:'Little Diego #4',r:180,d:15,o:0,b:0},{n:'New guy #5',r:180,d:15,o:0,b:0}]},
+    {id:'2508b',label:'8/16-8/31/25',  w:[{n:'[81]',r:192,d:13,o:0,b:0},{n:'Moises #1',r:203,d:16,o:0,b:0},{n:'Vinicio #2',r:185,d:16,o:0,b:0},{n:'Carlos #3',r:180,d:15,o:0,b:0},{n:'Little Diego #4',r:180,d:16,o:0,b:0},{n:'New guy #5',r:180,d:16,o:0,b:0}]},
+    {id:'2509a',label:'9/1-9/15/25',   w:[{n:'[81]',r:192,d:13,o:0,b:0},{n:'Moises #1',r:203,d:15,o:0,b:0},{n:'Vinicio #2',r:185,d:14,o:0,b:0},{n:'Carlos #3',r:180,d:14,o:0,b:0},{n:'Little Diego #4',r:180,d:15,o:0,b:0},{n:'New guy #5',r:180,d:15,o:0,b:0}]},
+    {id:'2509b',label:'9/16-9/30/25',  w:[{n:'[81]',r:192,d:12,o:1,b:0},{n:'Moises #1',r:203,d:15,o:0,b:40},{n:'Vinicio #2',r:185,d:15,o:0,b:35},{n:'Carlos #3',r:180,d:14,o:0,b:35},{n:'Little Diego #4',r:180,d:15,o:0,b:35},{n:'New guy #5',r:180,d:15,o:0,b:35}]},
+    {id:'2510a',label:'10/1-10/15/25', w:[{n:'[81]',r:192,d:11.5,o:2,b:0},{n:'Moises #1',r:203,d:15,o:0,b:0},{n:'Vinicio #2',r:185,d:15,o:0,b:0},{n:'Carlos #3',r:180,d:13,o:0,b:0},{n:'Little Diego #4',r:180,d:15,o:0,b:0},{n:'Balde #5',r:180,d:15,o:0,b:0}]},
+    {id:'2510b',label:'10/16-10/31/25',w:[{n:'[81]',r:192,d:13,o:1,b:0},{n:'Moises #1',r:203,d:16,o:0,b:0},{n:'Vinicio #2',r:185,d:15,o:0,b:0},{n:'Carlos #3',r:180,d:15,o:0,b:0},{n:'Little Diego #4',r:180,d:16,o:0,b:0},{n:'Balde #5',r:180,d:16,o:0,b:0}]},
+    {id:'2511a',label:'11/1-11/15/25', w:[{n:'[81]',r:192,d:11,o:2,b:0},{n:'Moises #1',r:203,d:15,o:0,b:0},{n:'Vinicio #2',r:185,d:15,o:0,b:0},{n:'Little Diego #3',r:180,d:15,o:0,b:0},{n:'Balde #4',r:180,d:15,o:0,b:0},{n:'Aleas #5',r:180,d:11,o:0,b:0},{n:'#6',r:180,d:11,o:0,b:0},{n:'#7',r:180,d:6,o:0,b:0},{n:'#8',r:180,d:6,o:0,b:0}]},
+    {id:'2511b',label:'11/16-11/30/25',w:[{n:'[81]',r:192,d:12,o:0,b:0},{n:'Moises #1',r:203,d:15,o:0,b:0},{n:'Vinicio #2',r:185,d:15,o:0,b:0},{n:'Little Diego #3',r:180,d:15,o:0,b:0},{n:'Balde #4',r:180,d:15,o:0,b:0},{n:'Aleas #5',r:180,d:15,o:0,b:0},{n:'Louis #6',r:180,d:14,o:0,b:0},{n:'#7',r:180,d:15,o:0,b:0},{n:'#8',r:180,d:15,o:0,b:0}]},
+    {id:'2512a',label:'12/1-12/15/25', w:[{n:'[81]',r:192,d:12,o:0,b:0},{n:'Moises #1',r:203,d:15,o:0,b:0},{n:'Vinicio #2',r:190,d:14,o:0,b:0},{n:'Little Diego #3',r:185,d:14,o:0,b:0},{n:'Saqueo',r:180,d:15,o:0,b:0},{n:'Elias',r:180,d:12,o:0,b:0},{n:'Louis',r:180,d:6,o:0,b:0},{n:'Manuel',r:180,d:5,o:0,b:0}]},
+    {id:'2512b',label:'12/16-12/31/25',w:[{n:'[81]',r:192,d:13,o:0,b:0},{n:'Moises #1',r:203,d:16,o:0,b:0},{n:'Vinicio #2',r:190,d:16,o:0,b:0},{n:'Little Diego #3',r:185,d:14,o:0,b:0},{n:'Saqueo',r:180,d:16,o:0,b:0},{n:'Elias',r:180,d:15,o:0,b:0},{n:'Louis',r:180,d:3,o:0,b:0},{n:'Manuel',r:180,d:8,o:0,b:0}]},
+    {id:'2601a',label:'1/1-1/15/26',   w:[{n:'[81]',r:192,d:13,o:0,b:0},{n:'Moises #1',r:203,d:14,o:0,b:0},{n:'Vinicio #2',r:190,d:15,o:0,b:0},{n:'Little Diego #3',r:185,d:14,o:0,b:0},{n:'Saqueo',r:180,d:14,o:0,b:0},{n:'Elias',r:180,d:12,o:0,b:0},{n:'Louis',r:180,d:0,o:0,b:0},{n:'Manuel',r:180,d:12,o:0,b:0}]},
+    {id:'2601b',label:'1/16-1/31/26',  w:[{n:'[81]',r:192,d:13,o:0,b:0},{n:'Moises #1',r:203,d:16,o:0,b:0},{n:'Vinicio #2',r:190,d:16,o:0,b:0},{n:'Little Diego #3',r:185,d:15,o:0,b:0},{n:'Saqueo',r:180,d:15.5,o:0,b:0},{n:'Elias',r:180,d:10,o:0,b:0},{n:'Louis',r:180,d:0,o:0,b:0},{n:'Manuel',r:180,d:8,o:0,b:0}]},
+    {id:'2602a',label:'2/1-2/15/26',   w:[{n:'[81]',r:192,d:13,o:0,b:0},{n:'Moises #1',r:203,d:15,o:0,b:0},{n:'Vinicio #2',r:190,d:13,o:0,b:0},{n:'Little Diego #3',r:185,d:15,o:0,b:0},{n:'Saqueo',r:180,d:13,o:0,b:0},{n:'Elias',r:180,d:9,o:0,b:0},{n:'Louis',r:180,d:0,o:0,b:0},{n:'Manuel',r:180,d:10,o:0,b:0}]},
+    {id:'2602b',label:'2/16-2/28/26',  w:[{n:'[81]',r:192,d:12,o:0,b:0},{n:'Moises #1',r:203,d:13,o:0,b:0},{n:'Vinicio #2',r:190,d:12,o:0,b:0},{n:'Little Diego #3',r:185,d:11,o:0,b:0},{n:'Saqueo',r:180,d:11,o:0,b:0},{n:'Elias',r:180,d:13,o:0,b:0},{n:'Louis',r:180,d:1,o:0,b:0},{n:'Manuel',r:180,d:13,o:0,b:0}]},
+    {id:'2603a',label:'3/1-3/15/26',   w:[{n:'[81]',r:192,d:12,o:0,b:0},{n:'Moises #1',r:203,d:15,o:0,b:30},{n:'Vinicio #2',r:190,d:15,o:0,b:25},{n:'Little Diego #3',r:185,d:13,o:0,b:25},{n:'Saqueo',r:180,d:14,o:0,b:25},{n:'Elias',r:180,d:12,o:0,b:25},{n:'Louis',r:180,d:2,o:0,b:0},{n:'Manuel',r:180,d:11,o:0,b:25}]},
+  ];
+  const batch = writeBatch(db);
+  hist.forEach(h => {
+    const workers = h.w.map(w=>({id:uid(),name:w.n,rate:w.r,days:w.d,daysOff:w.o,bonus:w.b}));
+    batch.set(doc(db,'periods',h.id), {id:h.id, label:h.label, workers});
+  });
+  await batch.commit();
+}
+
+// ════════════════════════════════════
+// RENDER
+// ════════════════════════════════════
+function renderPeriodSelect() {
+  const sel = document.getElementById('period-select');
+  sel.innerHTML = periods.map(p=>`<option value="${p.id}">${p.label}</option>`).join('');
+  if (currentPeriodId) sel.value = currentPeriodId;
+}
+
+function loadPeriod(id) {
+  currentPeriodId = id;
+  renderPeriodSelect();
+  const period = periods.find(p=>p.id===id);
+  if (!period) return;
+  const tm = todayMeta();
+  const isNow = id===tm.id, isFuture = id>tm.id;
+  document.getElementById('sum-label').textContent = period.label;
+  document.getElementById('sum-total').textContent = fmt(calcP(period));
+  document.getElementById('sum-workers').textContent = (period.workers||[]).length+' worker'+((period.workers||[]).length!==1?'s':'');
+  const se = document.getElementById('sum-status');
+  if (isNow) {
+    const t=new Date(); t.setHours(0,0,0,0);
+    const e=new Date(tm.end); e.setHours(0,0,0,0);
+    const dl=Math.ceil((e-t)/86400000)+1;
+    se.innerHTML=`<div class="period-status active"><span class="sdot"></span>Active Period</div>`;
+    const db2=document.getElementById('sum-days');
+    db2.textContent=dl>0?`${dl} day${dl!==1?'s':''} remaining`:'Last day!';
+    db2.style.display='inline-block';
+  } else {
+    se.innerHTML=`<div class="period-status ${isFuture?'future':''}"><span class="sdot"></span>${isFuture?'Upcoming':'Completed'}</div>`;
+    document.getElementById('sum-days').style.display='none';
+  }
+  renderWorkers(period);
+}
+
+function renderWorkers(period) {
+  const list = document.getElementById('workers-list');
+  const workers = period.workers || [];
+  if (!workers.length) { list.innerHTML='<div class="section-empty">No workers yet. Add one above.</div>'; return; }
+  const ro = isUnlocked ? '' : 'readonly';
+  const canEdit = isAdmin && isUnlocked;
+  list.innerHTML = workers.map(w => {
+    const t = calcW(w);
+    return `<div class="worker-row" id="wr-${w.id}">
+      <div class="worker-row-top">
+        <input class="worker-name-input" value="${esc(w.name)}" ${ro} placeholder="Name"
+          onfocus="gateEdit(event,'${period.id}','${w.id}','name')"
+          onchange="doUpdate('${period.id}','${w.id}','name',this.value)"/>
+        <span class="worker-total" id="wt-${w.id}">${fmt(t)}</span>
+      </div>
+      <div class="worker-fields">
+        <div class="field-group"><span class="field-label">Days Worked</span>
+          <input class="field-input" type="number" value="${w.days}" min="0" step="0.5" ${ro}
+            onfocus="gateEdit(event,'${period.id}','${w.id}','days')"
+            onchange="doUpdate('${period.id}','${w.id}','days',parseFloat(this.value)||0)"/></div>
+        <div class="field-group"><span class="field-label">Daily Rate $</span>
+          <input class="field-input" type="number" value="${w.rate}" min="0" ${ro}
+            onfocus="gateEdit(event,'${period.id}','${w.id}','rate')"
+            onchange="doUpdate('${period.id}','${w.id}','rate',parseFloat(this.value)||0)"/></div>
+        <div class="field-group"><span class="field-label">Days Off</span>
+          <input class="field-input" type="number" value="${w.daysOff}" min="0" step="0.5" ${ro}
+            onfocus="gateEdit(event,'${period.id}','${w.id}','daysOff')"
+            onchange="doUpdate('${period.id}','${w.id}','daysOff',parseFloat(this.value)||0)"/></div>
+        <div class="field-group"><span class="field-label">Bonus $</span>
+          <input class="field-input" type="number" value="${w.bonus||0}" min="0" ${ro}
+            onfocus="gateEdit(event,'${period.id}','${w.id}','bonus')"
+            onchange="doUpdate('${period.id}','${w.id}','bonus',parseFloat(this.value)||0)"/></div>
+      </div>
+      ${canEdit ? `<div class="worker-row-bottom"><button class="btn-danger" onclick="removeWorker('${period.id}','${w.id}')">Remove</button></div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function renderHistoryList() {
+  const allTotal = periods.reduce((s,p)=>s+calcP(p),0);
+  const el=document.getElementById('history-alltime-total'); if(el) el.textContent=fmt(allTotal);
+  const pc=document.getElementById('history-period-count'); if(pc) pc.textContent=`${periods.length} period${periods.length!==1?'s':''} · ${periods.reduce((s,p)=>s+(p.workers||[]).length,0)} worker entries`;
+  const pr=document.getElementById('history-period-range');
+  if(pr&&periods.length) { const a=[...periods].sort((a,b)=>a.id.localeCompare(b.id)); pr.textContent=`${a[0].label} → ${a[a.length-1].label}`; }
+  const list=document.getElementById('history-list');
+  if(!periods.length){list.innerHTML='<div class="section-empty">No periods yet.</div>';return;}
+  const tm=todayMeta();
+  list.innerHTML=[...periods].sort((a,b)=>b.id.localeCompare(a.id)).map(p=>{
+    const isNow=p.id===tm.id;
+    return `<div class="history-row" onclick="goToPeriod('${p.id}')">
+      <span class="history-period">${p.label}${isNow?'<span class="badge-now" style="margin-left:6px">● Now</span>':''}</span>
+      <span class="history-workers">${(p.workers||[]).length} workers</span>
+      <span class="history-total">${fmt(calcP(p))}</span>
+    </div>`;
+  }).join('');
+}
+
+function goToPeriod(id) { showView('current'); loadPeriod(id); document.getElementById('period-select').value=id; }
+
+// ════════════════════════════════════
+// EDIT (admin only)
+// ════════════════════════════════════
+window.gateEdit = function(event, pid, wid, field) {
+  if (!isAdmin) { event.target.blur(); return; }
+  if (!isUnlocked) {
+    event.target.blur();
+    requireUnlock(() => { const p=periods.find(x=>x.id===pid); if(p) renderWorkers(p); });
+  }
+};
+
+window.doUpdate = async function(pid, wid, field, value) {
+  if (!isAdmin || !isUnlocked) return;
+  const period = periods.find(p=>p.id===pid);
+  if (!period) return;
+  const worker = (period.workers||[]).find(w=>w.id===wid);
+  if (!worker) return;
+  worker[field] = value;
+  // Update UI instantly
+  const wtEl = document.getElementById('wt-'+wid);
+  if(wtEl) wtEl.textContent = fmt(calcW(worker));
+  document.getElementById('sum-total').textContent = fmt(calcP(period));
+  setSyncStatus('syncing','Saving…');
+  try {
+    await savePeriod(period);
+    setSyncStatus('ok','Connected · Live sync active');
+  } catch(e) { setSyncStatus('error','Save failed'); }
+};
+
+window.removeWorker = async function(pid, wid) {
+  if (!isAdmin || !isUnlocked) return;
+  const period = periods.find(p=>p.id===pid);
+  if (!period) return;
+  period.workers = (period.workers||[]).filter(w=>w.id!==wid);
+  setSyncStatus('syncing','Saving…');
+  await savePeriod(period);
+};
+
+window.addWorker = function() {
+  if (!isAdmin) return;
+  requireUnlock(() => {
+    ['nw-name','nw-rate','nw-days','nw-off','nw-bonus'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('nw-rate').value='180';
+    openModal('modal-worker');
+  });
+};
+
+window.saveNewWorker = async function() {
+  const name = document.getElementById('nw-name').value.trim();
+  if (!name) return;
+  const period = periods.find(p=>p.id===currentPeriodId);
+  if (!period) return;
+  const worker = {
+    id: uid(), name,
+    rate:    parseFloat(document.getElementById('nw-rate').value)||0,
+    days:    parseFloat(document.getElementById('nw-days').value)||0,
+    daysOff: parseFloat(document.getElementById('nw-off').value)||0,
+    bonus:   parseFloat(document.getElementById('nw-bonus').value)||0,
+  };
+  if (!period.workers) period.workers = [];
+  period.workers.push(worker);
+  closeModal('modal-worker');
+  setSyncStatus('syncing','Saving…');
+  await savePeriod(period);
+};
+
+// ════════════════════════════════════
+// CALENDAR CLICK → PERIOD
+// ════════════════════════════════════
+window.chipClick = async function(pid, y, m, startDay) {
+  let period = periods.find(p=>p.id===pid);
+  if (!period) {
+    const meta = periodMeta(new Date(y,m,startDay));
+    const last = periods[periods.length-1];
+    const workers = last&&last.workers&&last.workers.length
+      ? last.workers.map(w=>({id:uid(),name:w.name,rate:w.rate,days:0,daysOff:0,bonus:0}))
+      : [];
+    period = {id:meta.id, label:meta.label, workers};
+    await savePeriod(period);
+  }
+  loadPeriod(pid);
+  document.getElementById('period-select').value = pid;
+};
+
+// ════════════════════════════════════
+// LOCK / PASSWORD
+// ════════════════════════════════════
+function getEditPw() { return localStorage.getItem(PW_KEY) || DEFAULT_EDIT_PW; }
+
+function requireUnlock(cb) {
+  if (!isAdmin) return;
+  if (isUnlocked) { if(cb) cb(); return; }
+  pwCallback = cb;
+  document.getElementById('pw-input').value='';
+  document.getElementById('pw-err').classList.remove('show');
+  openModal('modal-pw');
+  setTimeout(()=>document.getElementById('pw-input').focus(),150);
+}
+
+window.submitPw = function() {
+  const val = document.getElementById('pw-input').value;
+  if (val===getEditPw()) {
+    closeModal('modal-pw');
+    setUnlocked(true);
+    if(pwCallback){const cb=pwCallback;pwCallback=null;cb();}
+  } else {
+    const inp=document.getElementById('pw-input');
+    inp.classList.add('shake');
+    document.getElementById('pw-err').classList.add('show');
+    setTimeout(()=>inp.classList.remove('shake'),400);
+  }
+};
+
+window.toggleLock = function() {
+  if (!isAdmin) return;
+  if (isUnlocked) setUnlocked(false); else requireUnlock(null);
+};
+
+function setUnlocked(v) {
+  isUnlocked = v;
+  const badge=document.getElementById('lock-badge');
+  const label=document.getElementById('lock-label');
+  const icon=document.getElementById('lock-icon');
+  if(v){
+    badge.classList.add('unlocked'); label.textContent='Unlocked';
+    icon.innerHTML='<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 019.9-1"/>';
+  } else {
+    badge.classList.remove('unlocked'); label.textContent='Locked';
+    icon.innerHTML='<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>';
+  }
+  if(currentPeriodId){const p=periods.find(x=>x.id===currentPeriodId);if(p)renderWorkers(p);}
+  refreshSettings();
+}
+
+window.openChangePassword = function() {
+  requireUnlock(()=>{
+    ['cpw-current','cpw-new','cpw-confirm'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('cpw-current-err').classList.remove('show');
+    document.getElementById('cpw-match-err').classList.remove('show');
+    document.getElementById('pw-strength-bar').className='pw-strength';
+    document.getElementById('pw-strength-label').textContent='';
+    openModal('modal-change-pw');
+    setTimeout(()=>document.getElementById('cpw-current').focus(),150);
+  });
+};
+
+window.submitChangePw = function() {
+  const curr=document.getElementById('cpw-current').value;
+  const newPw=document.getElementById('cpw-new').value;
+  const conf=document.getElementById('cpw-confirm').value;
+  document.getElementById('cpw-current-err').classList.remove('show');
+  document.getElementById('cpw-match-err').classList.remove('show');
+  if(curr!==getEditPw()){
+    document.getElementById('cpw-current-err').classList.add('show');
+    const inp=document.getElementById('cpw-current');
+    inp.classList.add('shake'); setTimeout(()=>inp.classList.remove('shake'),400);
+    return;
+  }
+  if(!newPw||newPw!==conf){document.getElementById('cpw-match-err').classList.add('show');return;}
+  localStorage.setItem(PW_KEY,newPw);
+  closeModal('modal-change-pw');
+};
+
+window.checkPwStrength = function(pw) {
+  const bar=document.getElementById('pw-strength-bar');
+  const lbl=document.getElementById('pw-strength-label');
+  if(!pw){bar.className='pw-strength';lbl.textContent='';return;}
+  const strong=pw.length>=10&&/[A-Z]/.test(pw)&&/[0-9]/.test(pw)&&/[^A-Za-z0-9]/.test(pw);
+  const medium=pw.length>=6&&(/[A-Z]/.test(pw)||/[0-9]/.test(pw));
+  if(strong){bar.className='pw-strength strong';lbl.textContent='Strong';}
+  else if(medium){bar.className='pw-strength medium';lbl.textContent='Medium';}
+  else{bar.className='pw-strength weak';lbl.textContent='Weak';}
+};
+
+window.settingsToggleLock = function() {
+  if(isUnlocked){setUnlocked(false);}else requireUnlock(()=>refreshSettings());
+};
+
+// ════════════════════════════════════
+// SETTINGS
+// ════════════════════════════════════
+function refreshSettings() {
+  const lockText=document.getElementById('lock-status-text');
+  const lockBtn=document.getElementById('settings-lock-btn');
+  const danger=document.getElementById('danger-zone-section');
+  if(isAdmin&&isUnlocked){
+    lockText.textContent='App is currently unlocked';
+    lockBtn.textContent='Lock Now'; lockBtn.className='btn-danger btn-sm';
+    if(danger) danger.style.display='';
+  } else {
+    lockText.textContent='App is currently locked';
+    lockBtn.textContent='Unlock'; lockBtn.className='btn-ghost btn-sm';
+    if(danger) danger.style.display='none';
+  }
+  const allTotal=periods.reduce((s,p)=>s+calcP(p),0);
+  document.getElementById('settings-period-count').textContent=`${periods.length} bi-monthly period${periods.length!==1?'s':''} on record`;
+  document.getElementById('settings-alltime-total').textContent=fmt(allTotal)+' across all periods';
+}
+
+// ════════════════════════════════════
+// CLEAR ALL
+// ════════════════════════════════════
+window.confirmClearAll = function() {
+  const allTotal=periods.reduce((s,p)=>s+calcP(p),0);
+  document.getElementById('clear-summary').textContent=`${periods.length} pay periods · ${periods.reduce((s,p)=>s+(p.workers||[]).length,0)} worker entries · ${fmt(allTotal)} total`;
+  openModal('modal-clear-step1');
+};
+window.clearStep2 = function(){closeModal('modal-clear-step1');openModal('modal-clear-step2');};
+window.clearStep3 = function(){
+  closeModal('modal-clear-step2');
+  document.getElementById('clear-confirm-input').value='';
+  document.getElementById('clear-exec-btn').disabled=true;
+  openModal('modal-clear-step3');
+};
+window.executeClearAll = async function() {
+  closeModal('modal-clear-step3');
+  showLoading('Deleting all data…');
+  const batch=writeBatch(db);
+  periods.forEach(p=>batch.delete(doc(db,'periods',p.id)));
+  await batch.commit();
+  hideLoading();
+  showView('current');
+};
+
+// ════════════════════════════════════
+// EXPORT (CSV + PDF)
+// ════════════════════════════════════
+window.openExportModal = function() {
+  exportScope='current'; exportFormat='csv';
+  selectExport('current'); selectFormat('csv');
+  const p=currentPeriodId&&periods.find(x=>x.id===currentPeriodId);
+  document.getElementById('export-current-label').textContent=p?`Export "${p.label}"`:'Export the selected period';
+  document.getElementById('export-all-label').textContent=`${periods.length} periods · ${fmt(periods.reduce((s,p)=>s+calcP(p),0))} total`;
+  const sorted=[...periods].sort((a,b)=>b.id.localeCompare(a.id));
+  document.getElementById('export-period-checks').innerHTML=sorted.map(p=>{
+    const isNow=p.id===todayMeta().id;
+    return `<label style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--border);cursor:pointer" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background=''">
+      <input type="checkbox" class="period-check" data-id="${p.id}" style="width:15px;height:15px;accent-color:var(--accent)" onchange="updateChooseCount()" checked/>
+      <div style="flex:1">
+        <div style="font-family:'DM Mono',monospace;font-size:.78rem;color:var(--text);font-weight:500">${p.label}${isNow?' <span style="color:var(--accent2);font-size:.65rem">● Now</span>':''}</div>
+        <div style="font-size:.68rem;color:var(--muted)">${(p.workers||[]).length} workers</div>
+      </div>
+      <span style="font-family:'DM Mono',monospace;font-size:.78rem;color:var(--success);font-weight:600">${fmt(calcP(p))}</span>
+    </label>`;
+  }).join('');
+  updateChooseCount();
+  openModal('modal-export');
+};
+window.selectExport = function(scope) {
+  exportScope=scope;
+  document.getElementById('export-opt-current').classList.toggle('selected',scope==='current');
+  document.getElementById('export-opt-choose').classList.toggle('selected',scope==='choose');
+  document.getElementById('export-opt-all').classList.toggle('selected',scope==='all');
+  document.querySelectorAll('#modal-export .export-radio').forEach((r,i)=>{r.checked=(i===0&&scope==='current')||(i===1&&scope==='choose')||(i===2&&scope==='all');});
+  document.getElementById('export-period-list').style.display=scope==='choose'?'':'none';
+};
+window.updateChooseCount = function() {
+  const n=document.querySelectorAll('.period-check:checked').length;
+  const t=document.querySelectorAll('.period-check').length;
+  const el=document.getElementById('export-check-count'); if(el) el.textContent=`${n} of ${t} selected`;
+};
+window.checkAllPeriods = function(state){document.querySelectorAll('.period-check').forEach(cb=>cb.checked=state);updateChooseCount();};
+window.selectFormat = function(f) {
+  exportFormat=f;
+  const csvEl=document.getElementById('fmt-csv'), pdfEl=document.getElementById('fmt-pdf');
+  const btn=document.getElementById('export-download-btn');
+  const dlIcon='<svg style="width:13px;height:13px;margin-right:5px;vertical-align:middle" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
+  if(f==='csv'){
+    csvEl.style.borderColor='var(--accent)';csvEl.style.background='rgba(37,99,235,.07)';csvEl.querySelector('div').style.color='var(--accent)';
+    pdfEl.style.borderColor='var(--border)';pdfEl.style.background='var(--surface2)';pdfEl.querySelector('div').style.color='var(--muted)';
+    btn.innerHTML=dlIcon+'Download CSV';
+  } else {
+    pdfEl.style.borderColor='var(--accent)';pdfEl.style.background='rgba(37,99,235,.07)';pdfEl.querySelector('div').style.color='var(--accent)';
+    csvEl.style.borderColor='var(--border)';csvEl.style.background='var(--surface2)';csvEl.querySelector('div').style.color='var(--muted)';
+    btn.innerHTML=dlIcon+'Download PDF';
+  }
+};
+function buildCSV(ps) {
+  const rows=[['Date','Name','# of Days','Rate','Day off','Bonus','Total','Bi-Monthly Total']];
+  [...ps].sort((a,b)=>a.id.localeCompare(b.id)).forEach(p=>{
+    const tot=calcP(p);
+    (p.workers||[]).forEach((w,i)=>rows.push([p.label,w.name,w.days,w.rate,w.daysOff||'',w.bonus||'',calcW(w),i===(p.workers.length-1)?tot:'']));
+  });
+  return rows.map(r=>r.map(c=>`"${c}"`).join(',')).join('\n');
+}
+function buildPDF(ps,title) {
+  const sorted=[...ps].sort((a,b)=>a.id.localeCompare(b.id));
+  const grand=sorted.reduce((s,p)=>s+calcP(p),0);
+  const now=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  let html='';
+  sorted.forEach(p=>{
+    const pT=calcP(p);
+    html+=`<div class="period-block"><div class="period-header"><span>${p.label}</span><span>${fmt(pT)}</span></div><table><thead><tr><th>Worker</th><th>Days</th><th>Rate</th><th>Days Off</th><th>Bonus</th><th>Total</th></tr></thead><tbody>${(p.workers||[]).map(w=>`<tr><td>${esc(w.name)}</td><td>${w.days}</td><td>${fmt(w.rate)}</td><td>${w.daysOff||0}</td><td>${w.bonus?fmt(w.bonus):'-'}</td><td class="tc">${fmt(calcW(w))}</td></tr>`).join('')}</tbody><tfoot><tr><td colspan="5" style="text-align:right;font-weight:700;padding-top:6px">Period Total</td><td class="tc grand" style="padding-top:6px">${fmt(pT)}</td></tr></tfoot></table></div>`;
+  });
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${title}</title><style>@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;600&family=DM+Mono:wght@400;500&display=swap');*{box-sizing:border-box;margin:0;padding:0}body{font-family:'DM Sans',sans-serif;color:#1e293b;background:#fff;padding:32px;font-size:12px;max-width:900px;margin:0 auto}.doc-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px;padding-bottom:18px;border-bottom:2px solid #2563eb}.doc-title{font-family:'DM Serif Display',serif;font-size:26px;color:#2563eb;margin-bottom:4px}.doc-sub{font-size:11px;color:#64748b;font-family:'DM Mono',monospace}.grand-box{background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:12px 18px;text-align:right}.gl{font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:.06em;font-family:'DM Mono',monospace}.gv{font-family:'DM Serif Display',serif;font-size:22px;color:#2563eb;margin-top:2px}.period-block{margin-bottom:24px;page-break-inside:avoid}.period-header{display:flex;justify-content:space-between;background:#2563eb;color:#fff;padding:7px 12px;border-radius:6px 6px 0 0;font-weight:600;font-size:12px;font-family:'DM Mono',monospace}table{width:100%;border-collapse:collapse;border:1px solid #dde3ec;border-top:none}thead tr{background:#f8fafc}th{padding:6px 10px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:#64748b;font-weight:600;border-bottom:1px solid #dde3ec}td{padding:6px 10px;border-bottom:1px solid #f1f5f9;font-size:11.5px}tr:last-child td{border-bottom:none}tbody tr:nth-child(even){background:#f8fafc}.tc{font-family:'DM Mono',monospace;font-weight:600;color:#059669;text-align:right}tfoot tr{background:#f0f9ff}tfoot .grand{color:#2563eb;font-size:12.5px}.footer{margin-top:28px;padding-top:12px;border-top:1px solid #dde3ec;font-size:10px;color:#94a3b8;font-family:'DM Mono',monospace;display:flex;justify-content:space-between}@media print{body{padding:16px}.period-block{page-break-inside:avoid}}</style></head><body><div class="doc-header"><div><div class="doc-title">TerraGreenOak Payroll</div><div class="doc-sub">${title} · Generated ${now}</div></div>${sorted.length>1?`<div class="grand-box"><div class="gl">Grand Total</div><div class="gv">${fmt(grand)}</div><div class="gl" style="margin-top:2px">${sorted.length} periods</div></div>`:''}</div>${html}<div class="footer"><span>TerraGreenOak Payroll</span><span>Generated ${now}</span></div><script>window.onload=()=>window.print()<\/script></body></html>`;
+}
+window.doExport = function() {
+  let ps,baseName;
+  if(exportScope==='current'){const p=currentPeriodId&&periods.find(x=>x.id===currentPeriodId);if(!p)return;ps=[p];baseName=p.label.replace(/\//g,'-');}
+  else if(exportScope==='choose'){const ids=[...document.querySelectorAll('.period-check:checked')].map(cb=>cb.dataset.id);if(!ids.length)return;ps=periods.filter(p=>ids.includes(p.id));baseName=ids.length===1?ps[0].label.replace(/\//g,'-'):`${ids.length}-periods`;}
+  else{ps=periods;baseName='all-history';}
+  closeModal('modal-export');
+  if(exportFormat==='csv'){
+    const blob=new Blob([buildCSV(ps)],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`terragreenoak_${baseName}.csv`;a.click();
+  } else {
+    const title=exportScope==='current'?ps[0].label:exportScope==='choose'?(ps.length===1?ps[0].label:`${ps.length} Selected Periods`):'All Pay History';
+    const win=window.open(URL.createObjectURL(new Blob([buildPDF(ps,title)],{type:'text/html'})),'_blank');
+    if(!win){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([buildPDF(ps,title)],{type:'text/html'}));a.download=`terragreenoak_${baseName}.html`;a.click();}
+  }
+};
+
+// ════════════════════════════════════
+// CALENDAR
+// ════════════════════════════════════
+window.calNav = function(dir) { calBase=new Date(calBase.getFullYear(),calBase.getMonth()+dir,1); renderCal(); };
+function renderCal() {
+  const today=new Date(), y=calBase.getFullYear(), m=calBase.getMonth();
+  const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('cal-month-label').textContent=`${MONTHS[m]} ${y}`;
+  const firstDow=new Date(y,m,1).getDay(), dim=new Date(y,m+1,0).getDate();
+  const DOWS=['Su','Mo','Tu','We','Th','Fr','Sa'];
+  let html=DOWS.map(d=>`<div class="cal-dow">${d}</div>`).join('');
+  for(let i=0;i<firstDow;i++) html+='<div class="cal-day empty"></div>';
+  for(let d=1;d<=dim;d++){
+    const isToday=d===today.getDate()&&m===today.getMonth()&&y===today.getFullYear();
+    html+=`<div class="cal-day ${isToday?'today':d<=15?'half1':'half2'}">${d}</div>`;
+  }
+  document.getElementById('cal-grid').innerHTML=html;
+  const meta1=periodMeta(new Date(y,m,1)), meta2=periodMeta(new Date(y,m,16));
+  const tm=todayMeta();
+  const is1now=meta1.id===tm.id, is2now=meta2.id===tm.id;
+  document.getElementById('cal-period-bar').innerHTML=`
+    <div class="cal-period-chip chip-h1" onclick="chipClick('${meta1.id}',${y},${m},1)">
+      <span class="chip-dot"></span>${m+1}/1–15${is1now?'<span class="badge-now">● Now</span>':''}
+    </div>
+    <div class="cal-period-chip chip-h2" onclick="chipClick('${meta2.id}',${y},${m},16)">
+      <span class="chip-dot"></span>${m+1}/16–${dim}${is2now?'<span class="badge-now">● Now</span>':''}
+    </div>`;
+}
+
+// ════════════════════════════════════
+// CLOCK
+// ════════════════════════════════════
+function tickClock() {
+  const now=new Date();
+  const d=now.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  const t=now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  document.getElementById('live-clock').textContent=`${d} · ${t}`;
+  document.getElementById('cal-date-label').textContent=now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+}
+
+// ════════════════════════════════════
+// UI HELPERS
+// ════════════════════════════════════
+window.showView = function(name) {
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  document.getElementById('nav-'+name).classList.add('active');
+  if(name==='settings') refreshSettings();
+};
+window.openModal  = function(id){document.getElementById(id).classList.add('open');};
+window.closeModal = function(id){document.getElementById(id).classList.remove('open');};
+document.querySelectorAll('.modal-backdrop').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
+window.togglePwEye = function(inputId,btn){const inp=document.getElementById(inputId);inp.type=inp.type==='password'?'text':'password';btn.textContent=inp.type==='password'?'show':'hide';};
+function showLoading(msg){document.getElementById('loading-msg').textContent=msg||'Loading…';document.getElementById('loading-overlay').classList.remove('hidden');}
+function hideLoading(){document.getElementById('loading-overlay').classList.add('hidden');}
+</script>
+</body>
+</html>
