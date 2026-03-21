@@ -182,7 +182,17 @@ select:focus{outline:1px solid var(--accent)}
 .pw-strength.strong{background:var(--success);width:100%}
 .pw-strength-label{font-size:.62rem;font-family:'DM Mono',monospace;color:var(--muted);margin-top:3px}
 
-/* ── USER CHIP ── */
+/* ── PAY TYPE TOGGLE ── */
+.pay-type-toggle{display:flex;gap:0;border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:10px;width:100%;max-width:240px}
+.pay-type-btn{flex:1;padding:5px 10px;font-family:'DM Mono',monospace;font-size:.68rem;text-align:center;cursor:pointer;background:var(--surface2);color:var(--muted);border:none;border-radius:0;transition:all .15s;font-weight:500}
+.pay-type-btn.active{background:var(--accent);color:#fff;font-weight:600}
+.pay-type-btn:disabled{cursor:default;opacity:.7}
+.fixed-badge{font-family:'DM Mono',monospace;font-size:.65rem;padding:2px 7px;border-radius:8px;background:rgba(14,165,233,.1);border:1px solid rgba(14,165,233,.25);color:var(--accent2);margin-left:6px;vertical-align:middle}
+
+/* ── ADD WORKER PAY TYPE ── */
+.pay-type-select-wrap{display:flex;gap:0;border:1px solid var(--border);border-radius:6px;overflow:hidden;width:100%}
+.pay-type-select-btn{flex:1;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:.85rem;text-align:center;cursor:pointer;background:var(--surface2);color:var(--muted);border:none;transition:all .15s}
+.pay-type-select-btn.active{background:var(--accent);color:#fff;font-weight:600}
 .user-chip{display:flex;align-items:center;gap:5px;font-family:'DM Mono',monospace;font-size:.65rem;padding:4px 9px;border-radius:12px;border:1px solid var(--border);color:var(--muted)}
 .user-chip.admin-chip{border-color:rgba(37,99,235,.3);color:var(--accent);background:rgba(37,99,235,.06)}
 .user-chip.viewer-chip{border-color:rgba(14,165,233,.3);color:var(--accent2);background:rgba(14,165,233,.06)}
@@ -497,9 +507,18 @@ select:focus{outline:1px solid var(--accent)}
     <h2>Add Worker</h2>
     <p class="sub">Carries over to future periods with days reset to zero.</p>
     <div class="form-field"><label class="form-label">Name</label><input class="form-input" id="nw-name" placeholder="e.g. Moises #1"/></div>
-    <div class="form-field"><label class="form-label">Daily Rate ($)</label><input class="form-input" id="nw-rate" type="number" placeholder="180" min="0"/></div>
-    <div class="form-field"><label class="form-label">Days Worked</label><input class="form-input" id="nw-days" type="number" placeholder="0" min="0" step="0.5"/></div>
-    <div class="form-field"><label class="form-label">Days Off</label><input class="form-input" id="nw-off" type="number" placeholder="0" min="0" step="0.5"/></div>
+    <div class="form-field">
+      <label class="form-label">Pay Type</label>
+      <div class="pay-type-select-wrap">
+        <button class="pay-type-select-btn active" id="nw-pt-daily" onclick="selectNewWorkerPayType('daily')">Daily Rate</button>
+        <button class="pay-type-select-btn" id="nw-pt-fixed" onclick="selectNewWorkerPayType('fixed')">Fixed Bi-Monthly</button>
+      </div>
+    </div>
+    <div class="form-field"><label class="form-label" id="nw-rate-label">Daily Rate ($)</label><input class="form-input" id="nw-rate" type="number" placeholder="180" min="0"/></div>
+    <div id="nw-days-fields">
+      <div class="form-field"><label class="form-label">Days Worked</label><input class="form-input" id="nw-days" type="number" placeholder="0" min="0" step="0.5"/></div>
+      <div class="form-field"><label class="form-label">Days Off</label><input class="form-input" id="nw-off" type="number" placeholder="0" min="0" step="0.5"/></div>
+    </div>
     <div class="form-field"><label class="form-label">Bonus ($)</label><input class="form-input" id="nw-bonus" type="number" placeholder="0" min="0"/></div>
     <div class="modal-actions">
       <button class="btn-ghost" onclick="closeModal('modal-worker')">Cancel</button>
@@ -640,11 +659,12 @@ let isOwner       = false;
 let isUnlocked    = false;
 let pwCallback    = null;
 let currentPeriodId = null;
-let periods       = [];   // local mirror of Firestore data
-let unsubscribe   = null; // live listener
+let periods       = [];
+let unsubscribe   = null;
 let calBase       = new Date();
 let exportScope   = 'current';
 let exportFormat  = 'csv';
+let suppressSnapshot = false;
 
 // ════════════════════════════════════
 // AUTH
@@ -728,10 +748,13 @@ function startListener() {
   showLoading('Connecting to cloud…');
   setSyncStatus('syncing', 'Connecting…');
 
+  let initialLoad = true;
+
   const periodsCol = collection(db, 'periods');
   unsubscribe = onSnapshot(
     query(periodsCol, orderBy('id')),
     snapshot => {
+      // Always update the local periods array
       periods = [];
       snapshot.forEach(docSnap => {
         periods.push({ firestoreId: docSnap.id, ...docSnap.data() });
@@ -739,7 +762,31 @@ function startListener() {
       periods.sort((a,b) => a.id.localeCompare(b.id));
       hideLoading();
       setSyncStatus('ok', 'Connected · Live sync active');
-      onPeriodsLoaded();
+
+      if (suppressSnapshot) {
+        // A local edit just saved — skip full re-render, just refresh totals quietly
+        if (currentPeriodId) {
+          const p = periods.find(x=>x.id===currentPeriodId);
+          if (p) {
+            document.getElementById('sum-total').textContent = fmt(calcP(p));
+            renderHistoryList();
+          }
+        }
+        return;
+      }
+
+      if (initialLoad) {
+        initialLoad = false;
+        onPeriodsLoaded();
+      } else {
+        // Remote change from another device — do full refresh
+        renderPeriodSelect();
+        renderHistoryList();
+        if (currentPeriodId) {
+          const p = periods.find(x=>x.id===currentPeriodId);
+          if (p) renderWorkers(p);
+        }
+      }
     },
     error => {
       console.error('Firestore error:', error);
@@ -787,7 +834,10 @@ function periodMeta(d) {
   return {id:`${yy}${mm}b`, label:`${m+1}/16-${m+1}/${dim}/${yy}`, start:new Date(y,m,16), end:new Date(y,m,dim)};
 }
 function todayMeta() { return periodMeta(new Date()); }
-function calcW(w) { return Math.round(w.days*w.rate - w.daysOff*w.rate + (w.bonus||0)); }
+function calcW(w) {
+  if (w.payType === 'fixed') return Math.round((w.rate||0) + (w.bonus||0));
+  return Math.round(w.days*w.rate - w.daysOff*w.rate + (w.bonus||0));
+}
 function calcP(p) { return (p.workers||[]).reduce((s,w)=>s+calcW(w),0); }
 function fmt(n)   { return '$'+n.toLocaleString(); }
 function esc(s)   { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -799,7 +849,10 @@ function uid()    { return Date.now().toString(36)+Math.random().toString(36).sl
 async function savePeriod(period) {
   const ref = doc(db, 'periods', period.id);
   const {firestoreId, ...data} = period;
+  suppressSnapshot = true;
   await setDoc(ref, data, {merge:true});
+  // Allow snapshot re-renders again after a short delay
+  setTimeout(() => { suppressSnapshot = false; }, 1500);
 }
 
 async function ensureCurrentPeriod() {
@@ -892,26 +945,47 @@ function renderWorkers(period) {
   const canEdit = isAdmin && isUnlocked;
   list.innerHTML = workers.map(w => {
     const t = calcW(w);
+    const isFixed = w.payType === 'fixed';
+    const rateLabel = isFixed ? 'Fixed Pay $' : 'Daily Rate $';
+    const ratePlaceholder = isFixed ? 'Period amount' : '180';
     return `<div class="worker-row" id="wr-${w.id}">
       <div class="worker-row-top">
-        <input class="worker-name-input" value="${esc(w.name)}" ${ro} placeholder="Name"
-          onfocus="gateEdit(event,'${period.id}','${w.id}','name')"
-          onchange="doUpdate('${period.id}','${w.id}','name',this.value)"/>
+        <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:0">
+          <input class="worker-name-input" value="${esc(w.name)}" ${ro} placeholder="Name"
+            onfocus="gateEdit(event,'${period.id}','${w.id}','name')"
+            onchange="doUpdate('${period.id}','${w.id}','name',this.value)" style="max-width:180px"/>
+          ${isFixed ? `<span class="fixed-badge">Fixed</span>` : ''}
+        </div>
         <span class="worker-total" id="wt-${w.id}">${fmt(t)}</span>
       </div>
+
+      ${canEdit ? `
+      <div class="pay-type-toggle" style="margin-bottom:10px">
+        <button class="pay-type-btn ${!isFixed?'active':''}" onclick="setPayType('${period.id}','${w.id}','daily')" ${!isFixed?'':''}
+          ${!isUnlocked?'disabled':''}>Daily Rate</button>
+        <button class="pay-type-btn ${isFixed?'active':''}" onclick="setPayType('${period.id}','${w.id}','fixed')"
+          ${!isUnlocked?'disabled':''}>Fixed Amount</button>
+      </div>` : `
+      <div style="font-family:'DM Mono',monospace;font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">
+        Pay type: <strong style="color:var(--text)">${isFixed?'Fixed bi-monthly':'Daily rate'}</strong>
+      </div>`}
+
       <div class="worker-fields">
+        ${!isFixed ? `
         <div class="field-group"><span class="field-label">Days Worked</span>
           <input class="field-input" type="number" value="${w.days}" min="0" step="0.5" ${ro}
             onfocus="gateEdit(event,'${period.id}','${w.id}','days')"
-            onchange="doUpdate('${period.id}','${w.id}','days',parseFloat(this.value)||0)"/></div>
-        <div class="field-group"><span class="field-label">Daily Rate $</span>
+            onchange="doUpdate('${period.id}','${w.id}','days',parseFloat(this.value)||0)"/></div>` : ''}
+        <div class="field-group"><span class="field-label">${rateLabel}</span>
           <input class="field-input" type="number" value="${w.rate}" min="0" ${ro}
+            placeholder="${ratePlaceholder}"
             onfocus="gateEdit(event,'${period.id}','${w.id}','rate')"
             onchange="doUpdate('${period.id}','${w.id}','rate',parseFloat(this.value)||0)"/></div>
+        ${!isFixed ? `
         <div class="field-group"><span class="field-label">Days Off</span>
           <input class="field-input" type="number" value="${w.daysOff}" min="0" step="0.5" ${ro}
             onfocus="gateEdit(event,'${period.id}','${w.id}','daysOff')"
-            onchange="doUpdate('${period.id}','${w.id}','daysOff',parseFloat(this.value)||0)"/></div>
+            onchange="doUpdate('${period.id}','${w.id}','daysOff',parseFloat(this.value)||0)"/></div>` : ''}
         <div class="field-group"><span class="field-label">Bonus $</span>
           <input class="field-input" type="number" value="${w.bonus||0}" min="0" ${ro}
             onfocus="gateEdit(event,'${period.id}','${w.id}','bonus')"
@@ -981,13 +1055,42 @@ window.removeWorker = async function(pid, wid) {
   await savePeriod(period);
 };
 
+window.setPayType = async function(pid, wid, payType) {
+  if (!isAdmin || !isUnlocked) return;
+  const period = periods.find(p=>p.id===pid);
+  if (!period) return;
+  const worker = (period.workers||[]).find(w=>w.id===wid);
+  if (!worker) return;
+  worker.payType = payType;
+  // Reset days-related fields when switching to fixed
+  if (payType === 'fixed') { worker.days = 0; worker.daysOff = 0; }
+  setSyncStatus('syncing','Saving…');
+  await savePeriod(period);
+  // Re-render immediately (don't wait for snapshot)
+  renderWorkers(period);
+  document.getElementById('sum-total').textContent = fmt(calcP(period));
+  setSyncStatus('ok','Connected · Live sync active');
+};
+
 window.addWorker = function() {
   if (!isAdmin) return;
   requireUnlock(() => {
     ['nw-name','nw-rate','nw-days','nw-off','nw-bonus'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('nw-rate').value='180';
+    selectNewWorkerPayType('daily'); // reset to daily
     openModal('modal-worker');
   });
+};
+
+window.selectNewWorkerPayType = function(type) {
+  const isFixed = type === 'fixed';
+  document.getElementById('nw-pt-daily').classList.toggle('active', !isFixed);
+  document.getElementById('nw-pt-fixed').classList.toggle('active', isFixed);
+  document.getElementById('nw-days-fields').style.display = isFixed ? 'none' : '';
+  document.getElementById('nw-rate-label').textContent = isFixed ? 'Fixed Bi-Monthly Pay ($)' : 'Daily Rate ($)';
+  document.getElementById('nw-rate').placeholder = isFixed ? 'e.g. 2500' : '180';
+  document.getElementById('nw-pt-daily').dataset.selected = !isFixed ? '1' : '';
+  document.getElementById('nw-pt-fixed').dataset.selected = isFixed ? '1' : '';
 };
 
 window.saveNewWorker = async function() {
@@ -995,11 +1098,13 @@ window.saveNewWorker = async function() {
   if (!name) return;
   const period = periods.find(p=>p.id===currentPeriodId);
   if (!period) return;
+  const isFixed = document.getElementById('nw-pt-fixed').classList.contains('active');
   const worker = {
     id: uid(), name,
+    payType: isFixed ? 'fixed' : 'daily',
     rate:    parseFloat(document.getElementById('nw-rate').value)||0,
-    days:    parseFloat(document.getElementById('nw-days').value)||0,
-    daysOff: parseFloat(document.getElementById('nw-off').value)||0,
+    days:    isFixed ? 0 : (parseFloat(document.getElementById('nw-days').value)||0),
+    daysOff: isFixed ? 0 : (parseFloat(document.getElementById('nw-off').value)||0),
     bonus:   parseFloat(document.getElementById('nw-bonus').value)||0,
   };
   if (!period.workers) period.workers = [];
@@ -1221,10 +1326,22 @@ window.selectFormat = function(f) {
   }
 };
 function buildCSV(ps) {
-  const rows=[['Date','Name','# of Days','Rate','Day off','Bonus','Total','Bi-Monthly Total']];
+  const rows=[['Date','Name','Pay Type','Days','Rate','Days Off','Bonus','Total','Bi-Monthly Total']];
   [...ps].sort((a,b)=>a.id.localeCompare(b.id)).forEach(p=>{
     const tot=calcP(p);
-    (p.workers||[]).forEach((w,i)=>rows.push([p.label,w.name,w.days,w.rate,w.daysOff||'',w.bonus||'',calcW(w),i===(p.workers.length-1)?tot:'']));
+    (p.workers||[]).forEach((w,i)=>{
+      const isFixed = w.payType==='fixed';
+      rows.push([
+        p.label, w.name,
+        isFixed ? 'Fixed' : 'Daily',
+        isFixed ? '-' : w.days,
+        w.rate,
+        isFixed ? '-' : (w.daysOff||''),
+        w.bonus||'',
+        calcW(w),
+        i===(p.workers.length-1)?tot:''
+      ]);
+    });
   });
   return rows.map(r=>r.map(c=>`"${c}"`).join(',')).join('\n');
 }
