@@ -14,7 +14,7 @@
 :root{--bg:#f0f4f8;--surface:#fff;--surface2:#f8fafc;--border:#dde3ec;--accent:#2563eb;--accent2:#0ea5e9;--text:#1e293b;--muted:#64748b;--danger:#ef4444;--success:#059669;--warn:#f59e0b;--radius:10px}
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;padding-bottom:72px;overflow-x:hidden}
- 
+
 /* ── LOGIN SCREEN ── */
 #login-screen{position:fixed;inset:0;background:linear-gradient(135deg,#eff6ff,#e0f2fe);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:500;padding:24px}
 #login-screen.hidden{display:none}
@@ -34,13 +34,13 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
 .login-role-badge{display:inline-flex;align-items:center;gap:5px;font-family:'DM Mono',monospace;font-size:.65rem;padding:3px 8px;border-radius:10px;margin-top:14px;text-align:center;width:100%;justify-content:center}
 .login-role-badge.admin{background:rgba(37,99,235,.1);color:var(--accent);border:1px solid rgba(37,99,235,.2)}
 .login-role-badge.viewer{background:rgba(14,165,233,.1);color:var(--accent2);border:1px solid rgba(14,165,233,.2)}
- 
+
 /* ── SYNC STATUS ── */
 .sync-dot{width:7px;height:7px;border-radius:50%;background:var(--success);display:inline-block;margin-right:4px}
 .sync-dot.syncing{background:var(--warn);animation:pulse 1s infinite}
 .sync-dot.error{background:var(--danger)}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
- 
+
 /* ── HEADER ── */
 header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 16px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;gap:10px}
 .header-left h1{font-family:'DM Serif Display',serif;font-size:1.35rem;color:var(--accent);letter-spacing:-.02em;line-height:1}
@@ -50,7 +50,7 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
 .lock-badge{display:flex;align-items:center;gap:5px;font-family:'DM Mono',monospace;font-size:.68rem;padding:5px 10px;border-radius:20px;cursor:pointer;border:1px solid var(--border);color:var(--muted);transition:all .15s;user-select:none}
 .lock-badge.unlocked{border-color:var(--accent);color:var(--accent);background:rgba(37,99,235,.08)}
 .lock-badge svg{width:13px;height:13px}
- 
+
 /* ── BUTTONS ── */
 button{font-family:'DM Sans',sans-serif;cursor:pointer;border:none;border-radius:6px;font-size:.8rem;font-weight:500;padding:7px 14px;transition:all .15s}
 .btn-primary{background:var(--accent);color:#fff}
@@ -60,11 +60,11 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;border:none;border-radius
 .btn-danger{background:transparent;color:var(--danger);border:1px solid var(--danger);padding:4px 8px;font-size:.72rem}
 .btn-danger:hover{background:var(--danger);color:#fff}
 .btn-sm{padding:4px 10px;font-size:.75rem}
- 
+
 /* ── MAIN ── */
 main{padding:14px;max-width:900px;margin:0 auto}
 .view{display:none}.view.active{display:block}
- 
+
 /* ── CALENDAR ── */
 .cal-strip{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:14px}
 .cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:8px}
@@ -86,13 +86,13 @@ main{padding:14px;max-width:900px;margin:0 auto}
 .cal-period-chip.chip-h2{border-color:rgba(14,165,233,.35);color:var(--accent2);background:rgba(14,165,233,.07)}
 .chip-dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
 .badge-now{font-size:.6rem;background:rgba(14,165,233,.12);border:1px solid rgba(14,165,233,.3);color:var(--accent2);padding:1px 6px;border-radius:8px;margin-left:2px}
- 
+
 /* ── PERIOD BAR ── */
 .period-bar{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
 .period-bar label{font-size:.7rem;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.05em}
 select{background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:7px 12px;font-family:'DM Mono',monospace;font-size:.8rem;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;min-width:180px}
 select:focus{outline:1px solid var(--accent)}
- 
+
 /* ── SUMMARY ── */
 .summary-card{background:linear-gradient(135deg,#eff6ff,#e0f2fe);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--radius);padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
 .summary-period{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--accent);text-transform:uppercase;letter-spacing:.08em}
@@ -103,7 +103,7 @@ select:focus{outline:1px solid var(--accent)}
 .period-status.active{border-color:var(--accent2);color:var(--accent2);background:rgba(14,165,233,.08)}
 .period-status.future{border-color:var(--warn);color:var(--warn);background:rgba(245,158,11,.08)}
 .sdot{width:5px;height:5px;border-radius:50%;background:currentColor}
- 
+
 /* ── WORKERS ── */
 .workers-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:14px}
 .workers-section-header{padding:11px 15px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px}
@@ -125,7 +125,7 @@ select:focus{outline:1px solid var(--accent)}
 .field-input[readonly]{cursor:default;opacity:.65}
 .worker-row-bottom{display:flex;align-items:center;justify-content:flex-end;margin-top:8px}
 .section-empty{padding:20px 15px;color:var(--muted);font-size:.82rem;text-align:center}
- 
+
 /* ── HISTORY ── */
 .history-view{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
 .history-row{display:flex;align-items:center;padding:12px 15px;border-bottom:1px solid var(--border);gap:10px;flex-wrap:wrap;cursor:pointer;transition:background .1s}
@@ -134,7 +134,7 @@ select:focus{outline:1px solid var(--accent)}
 .history-period{font-family:'DM Mono',monospace;font-size:.78rem;color:var(--accent2);flex:1;min-width:110px}
 .history-total{font-family:'DM Serif Display',serif;font-size:1.1rem;color:var(--success)}
 .history-workers{font-size:.7rem;color:var(--muted)}
- 
+
 /* ── MODALS ── */
 .modal-backdrop{display:none;position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:200;align-items:center;justify-content:center;padding:20px}
 .modal-backdrop.open{display:flex}
@@ -153,7 +153,7 @@ select:focus{outline:1px solid var(--accent)}
 .err-hint.show{display:block}
 .pw-wrap{position:relative}
 .pw-eye{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);padding:4px;cursor:pointer;font-family:'DM Mono',monospace;font-size:.7rem}
- 
+
 /* ── SETTINGS ── */
 .settings-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:16px}
 .settings-section-title{padding:12px 16px;border-bottom:1px solid var(--border);font-family:'DM Mono',monospace;font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
@@ -166,7 +166,7 @@ select:focus{outline:1px solid var(--accent)}
 .settings-page-sub{font-size:.78rem;color:var(--muted);margin-bottom:18px}
 .danger-zone{border-color:rgba(239,68,68,.3)}
 .danger-zone .settings-section-title{color:var(--danger)}
- 
+
 /* ── EXPORT ── */
 .export-option{border:1px solid var(--border);border-radius:8px;padding:14px;cursor:pointer;transition:all .15s;margin-bottom:10px;display:flex;align-items:flex-start;gap:12px}
 .export-option:hover{border-color:var(--accent);background:rgba(37,99,235,.04)}
@@ -181,14 +181,14 @@ select:focus{outline:1px solid var(--accent)}
 .pw-strength.medium{background:var(--warn);width:66%}
 .pw-strength.strong{background:var(--success);width:100%}
 .pw-strength-label{font-size:.62rem;font-family:'DM Mono',monospace;color:var(--muted);margin-top:3px}
- 
+
 /* ── PAY TYPE TOGGLE ── */
 .pay-type-toggle{display:flex;gap:0;border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:10px;width:100%;max-width:240px}
 .pay-type-btn{flex:1;padding:5px 10px;font-family:'DM Mono',monospace;font-size:.68rem;text-align:center;cursor:pointer;background:var(--surface2);color:var(--muted);border:none;border-radius:0;transition:all .15s;font-weight:500}
 .pay-type-btn.active{background:var(--accent);color:#fff;font-weight:600}
 .pay-type-btn:disabled{cursor:default;opacity:.7}
 .fixed-badge{font-family:'DM Mono',monospace;font-size:.65rem;padding:2px 7px;border-radius:8px;background:rgba(14,165,233,.1);border:1px solid rgba(14,165,233,.25);color:var(--accent2);margin-left:6px;vertical-align:middle}
- 
+
 /* ── ADD WORKER PAY TYPE ── */
 .pay-type-select-wrap{display:flex;gap:0;border:1px solid var(--border);border-radius:6px;overflow:hidden;width:100%}
 .pay-type-select-btn{flex:1;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:.85rem;text-align:center;cursor:pointer;background:var(--surface2);color:var(--muted);border:none;transition:all .15s}
@@ -196,13 +196,13 @@ select:focus{outline:1px solid var(--accent)}
 .user-chip{display:flex;align-items:center;gap:5px;font-family:'DM Mono',monospace;font-size:.65rem;padding:4px 9px;border-radius:12px;border:1px solid var(--border);color:var(--muted)}
 .user-chip.admin-chip{border-color:rgba(37,99,235,.3);color:var(--accent);background:rgba(37,99,235,.06)}
 .user-chip.viewer-chip{border-color:rgba(14,165,233,.3);color:var(--accent2);background:rgba(14,165,233,.06)}
- 
+
 /* ── NAV ── */
 .nav-bottom{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:100}
 .nav-btn{flex:1;padding:10px 8px 13px;display:flex;flex-direction:column;align-items:center;gap:3px;background:transparent;border:none;color:var(--muted);font-size:.58rem;font-family:'DM Mono',monospace;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;transition:color .15s;border-radius:0}
 .nav-btn svg{width:19px;height:19px}
 .nav-btn.active{color:var(--accent)}
- 
+
 /* ── LOADING SPINNER ── */
 .spinner{display:inline-block;width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -211,7 +211,7 @@ select:focus{outline:1px solid var(--accent)}
 </style>
 </head>
 <body>
- 
+
 <!-- ── LOGIN SCREEN ── -->
 <div id="login-screen">
   <div class="login-logo">TerraGreenOak</div>
@@ -232,13 +232,13 @@ select:focus{outline:1px solid var(--accent)}
     <div class="login-err" id="login-err"></div>
   </div>
 </div>
- 
+
 <!-- ── LOADING ── -->
 <div class="loading-overlay" id="loading-overlay">
   <div class="spinner"></div>
   <span id="loading-msg">Loading payroll data…</span>
 </div>
- 
+
 <!-- ── HEADER ── -->
 <header>
   <div class="header-left">
@@ -258,7 +258,7 @@ select:focus{outline:1px solid var(--accent)}
     <button class="btn-primary btn-sm" onclick="openExportModal()">Export</button>
   </div>
 </header>
- 
+
 <main>
   <!-- CURRENT VIEW -->
   <div class="view active" id="view-current">
@@ -266,7 +266,7 @@ select:focus{outline:1px solid var(--accent)}
       <span class="sync-dot" id="sync-dot"></span>
       <span id="sync-msg">Connected · Live sync active</span>
     </div>
- 
+
     <div class="cal-strip">
       <div class="cal-header">
         <button class="cal-nav-btn" onclick="calNav(-1)">&#8249;</button>
@@ -279,12 +279,12 @@ select:focus{outline:1px solid var(--accent)}
       <div class="cal-grid" id="cal-grid"></div>
       <div class="cal-period-bar" id="cal-period-bar"></div>
     </div>
- 
+
     <div class="period-bar">
       <label>Period:</label>
       <select id="period-select" onchange="loadPeriod(this.value)"></select>
     </div>
- 
+
     <div class="summary-card">
       <div>
         <div class="summary-period" id="sum-label"></div>
@@ -297,7 +297,7 @@ select:focus{outline:1px solid var(--accent)}
         <div class="summary-badge" id="sum-days" style="display:none"></div>
       </div>
     </div>
- 
+
     <div class="workers-section">
       <div class="workers-section-header">
         <span class="section-title">Workers</span>
@@ -306,7 +306,7 @@ select:focus{outline:1px solid var(--accent)}
       <div id="workers-list"><div class="section-empty">Loading…</div></div>
     </div>
   </div>
- 
+
   <!-- HISTORY VIEW -->
   <div class="view" id="view-history">
     <div style="margin-bottom:14px">
@@ -324,12 +324,12 @@ select:focus{outline:1px solid var(--accent)}
     </div>
     <div class="history-view" id="history-list"></div>
   </div>
- 
+
   <!-- SETTINGS VIEW -->
   <div class="view" id="view-settings">
     <p class="settings-page-title">Settings</p>
     <p class="settings-page-sub">Manage your account, security, and data.</p>
- 
+
     <div class="settings-section">
       <div class="settings-section-title">👤 Account</div>
       <div class="settings-row">
@@ -342,7 +342,7 @@ select:focus{outline:1px solid var(--accent)}
         </div>
       </div>
     </div>
- 
+
     <div class="settings-section" id="admin-settings" style="display:none">
       <div class="settings-section-title">🔐 Security</div>
       <div class="settings-row">
@@ -373,7 +373,7 @@ select:focus{outline:1px solid var(--accent)}
         </div>
       </div>
     </div>
- 
+
     <div class="settings-section">
       <div class="settings-section-title">📤 Export Data</div>
       <div class="settings-row">
@@ -386,7 +386,7 @@ select:focus{outline:1px solid var(--accent)}
         </div>
       </div>
     </div>
- 
+
     <div class="settings-section">
       <div class="settings-section-title">ℹ️ About</div>
       <div class="settings-row">
@@ -407,7 +407,7 @@ select:focus{outline:1px solid var(--accent)}
         </div>
       </div>
     </div>
- 
+
     <div class="settings-section danger-zone" id="danger-zone-section" style="display:none">
       <div class="settings-section-title">⚠ Danger Zone</div>
       <div class="settings-row">
@@ -422,7 +422,7 @@ select:focus{outline:1px solid var(--accent)}
     </div>
   </div>
 </main>
- 
+
 <!-- BOTTOM NAV -->
 <nav class="nav-bottom">
   <button class="nav-btn active" id="nav-current" onclick="showView('current')">
@@ -438,7 +438,7 @@ select:focus{outline:1px solid var(--accent)}
     Settings
   </button>
 </nav>
- 
+
 <!-- ── MODALS ── -->
 <div class="modal-backdrop" id="modal-pw">
   <div class="modal">
@@ -459,7 +459,7 @@ select:focus{outline:1px solid var(--accent)}
     </div>
   </div>
 </div>
- 
+
 <div class="modal-backdrop" id="modal-change-pw">
   <div class="modal">
     <h2>Change Password</h2>
@@ -496,7 +496,7 @@ select:focus{outline:1px solid var(--accent)}
     </div>
   </div>
 </div>
- 
+
 <div class="modal-backdrop" id="modal-worker">
   <div class="modal">
     <h2>Add Worker</h2>
@@ -521,7 +521,7 @@ select:focus{outline:1px solid var(--accent)}
     </div>
   </div>
 </div>
- 
+
 <div class="modal-backdrop" id="modal-export">
   <div class="modal">
     <h2>Export Data</h2>
@@ -570,7 +570,7 @@ select:focus{outline:1px solid var(--accent)}
     </div>
   </div>
 </div>
- 
+
 <div class="modal-backdrop" id="modal-clear-step1">
   <div class="modal">
     <h2 style="color:var(--danger)">⚠️ Delete All Data?</h2>
@@ -611,12 +611,12 @@ select:focus{outline:1px solid var(--accent)}
     </div>
   </div>
 </div>
- 
+
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import { getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, onSnapshot, writeBatch, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
- 
+
 const firebaseConfig = {
   apiKey: "AIzaSyC5I95ekBxk0W54zuIg8kNzchOi10Io7as",
   authDomain: "terragreenoak-payroll.firebaseapp.com",
@@ -628,7 +628,7 @@ const firebaseConfig = {
 const app  = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db   = getFirestore(app);
- 
+
 const ADMIN_EMAIL = 'tonybalony0101@gmail.com';
 const EDITOR_EMAILS = [
   'tonybalony0101@gmail.com',
@@ -636,7 +636,7 @@ const EDITOR_EMAILS = [
 ];
 const PW_KEY = 'tgo_edit_pw';
 const DEFAULT_EDIT_PW = 'Happy6rocky';
- 
+
 let currentUser   = null;
 let isAdmin       = false;
 let isOwner       = false;
@@ -650,7 +650,7 @@ let exportScope   = 'current';
 let exportFormat  = 'csv';
 let suppressSnapshot = false;
 let pendingSaves = 0;
- 
+
 window.doLogin = async function() {
   const email = document.getElementById('login-email').value.trim();
   const pass  = document.getElementById('login-password').value;
@@ -668,12 +668,12 @@ window.doLogin = async function() {
     btn.textContent = 'Sign In';
   }
 };
- 
+
 window.doSignOut = async function() {
   if (unsubscribe) unsubscribe();
   await signOut(auth);
 };
- 
+
 onAuthStateChanged(auth, user => {
   if (user) {
     currentUser = user;
@@ -694,7 +694,7 @@ onAuthStateChanged(auth, user => {
     document.getElementById('login-password').value = '';
   }
 });
- 
+
 function initApp() {
   const chipWrap = document.getElementById('user-chip-wrap');
   chipWrap.innerHTML = `<div class="user-chip ${isOwner?'admin-chip':isAdmin?'viewer-chip':'viewer-chip'}">${isOwner?'Owner':isAdmin?'Editor':'Viewer'}</div>`;
@@ -708,7 +708,7 @@ function initApp() {
   renderCal();
   startListener();
 }
- 
+
 function startListener() {
   showLoading('Connecting to cloud…');
   setSyncStatus('syncing', 'Connecting…');
@@ -747,14 +747,14 @@ function startListener() {
     }
   );
 }
- 
+
 function setSyncStatus(state, msg) {
   const dot = document.getElementById('sync-dot');
   const txt = document.getElementById('sync-msg');
   dot.className = 'sync-dot' + (state==='syncing'?' syncing': state==='error'?' error':'');
   txt.textContent = msg;
 }
- 
+
 async function onPeriodsLoaded() {
   if (periods.length === 0) {
     await seedHistoricalData();
@@ -771,7 +771,7 @@ async function onPeriodsLoaded() {
     loadPeriod(cur.id);
   }
 }
- 
+
 function periodMeta(d) {
   const y=d.getFullYear(), m=d.getMonth(), day=d.getDate();
   const dim=new Date(y,m+1,0).getDate();
@@ -788,7 +788,7 @@ function calcP(p) { return (p.workers||[]).reduce((s,w)=>s+calcW(w),0); }
 function fmt(n)   { return '$'+n.toLocaleString(); }
 function esc(s)   { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function uid()    { return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
- 
+
 async function savePeriod(period) {
   const ref = doc(db, 'periods', period.id);
   const {firestoreId, ...data} = period;
@@ -805,7 +805,7 @@ async function savePeriod(period) {
     }
   }
 }
- 
+
 async function ensureCurrentPeriod() {
   const tm = todayMeta();
   if (periods.find(p=>p.id===tm.id)) return;
@@ -816,7 +816,7 @@ async function ensureCurrentPeriod() {
   const newPeriod = {id:tm.id, label:tm.label, workers};
   await savePeriod(newPeriod);
 }
- 
+
 async function seedHistoricalData() {
   showLoading('Uploading historical data…');
   const hist = [
@@ -849,13 +849,13 @@ async function seedHistoricalData() {
   });
   await batch.commit();
 }
- 
+
 function renderPeriodSelect() {
   const sel = document.getElementById('period-select');
   sel.innerHTML = periods.map(p=>`<option value="${p.id}">${p.label}</option>`).join('');
   if (currentPeriodId) sel.value = currentPeriodId;
 }
- 
+
 function loadPeriod(id) {
   currentPeriodId = id;
   renderPeriodSelect();
@@ -881,7 +881,7 @@ function loadPeriod(id) {
   }
   renderWorkers(period);
 }
- 
+
 function renderWorkers(period) {
   const list = document.getElementById('workers-list');
   const workers = period.workers || [];
@@ -935,7 +935,7 @@ function renderWorkers(period) {
     </div>`;
   }).join('');
 }
- 
+
 function renderHistoryList() {
   const allTotal = periods.reduce((s,p)=>s+calcP(p),0);
   const el=document.getElementById('history-alltime-total'); if(el) el.textContent=fmt(allTotal);
@@ -954,9 +954,9 @@ function renderHistoryList() {
     </div>`;
   }).join('');
 }
- 
+
 function goToPeriod(id) { showView('current'); loadPeriod(id); document.getElementById('period-select').value=id; }
- 
+
 window.gateEdit = function(event, pid, wid, field) {
   if (!isAdmin) { event.target.blur(); return; }
   if (!isUnlocked) {
@@ -964,7 +964,7 @@ window.gateEdit = function(event, pid, wid, field) {
     requireUnlock(() => { const p=periods.find(x=>x.id===pid); if(p) renderWorkers(p); });
   }
 };
- 
+
 window.doUpdate = async function(pid, wid, field, value) {
   if (!isAdmin || !isUnlocked) return;
   const period = periods.find(p=>p.id===pid);
@@ -981,32 +981,40 @@ window.doUpdate = async function(pid, wid, field, value) {
     setSyncStatus('ok','Connected · Live sync active');
   } catch(e) { setSyncStatus('error','Save failed'); }
 };
- 
+
 window.removeWorker = async function(pid, wid) {
   if (!isAdmin || !isUnlocked) return;
   const period = periods.find(p=>p.id===pid);
   if (!period) return;
+  // Update local state and re-render immediately
   period.workers = (period.workers||[]).filter(w=>w.id!==wid);
+  renderWorkers(period);
+  document.getElementById('sum-total').textContent = fmt(calcP(period));
+  document.getElementById('sum-workers').textContent = (period.workers||[]).length+' worker'+((period.workers||[]).length!==1?'s':'');
+  renderHistoryList();
   setSyncStatus('syncing','Saving…');
-  await savePeriod(period);
+  try {
+    await savePeriod(period);
+    setSyncStatus('ok','Connected · Live sync active');
+  } catch(e) { setSyncStatus('error','Save failed'); }
 };
- 
+
 window.setPayType = async function(pid, wid, payType) {
   if (!isAdmin || !isUnlocked) return;
   const period = periods.find(p=>p.id===pid);
   if (!period) return;
   const worker = (period.workers||[]).find(w=>w.id===wid);
   if (!worker) return;
- 
+
   // Update local state immediately
   worker.payType = payType;
   if (payType === 'fixed') { worker.days = 0; worker.daysOff = 0; }
- 
+
   // Re-render immediately from local state (before any network call)
   renderWorkers(period);
   document.getElementById('sum-total').textContent = fmt(calcP(period));
   setSyncStatus('syncing', 'Saving…');
- 
+
   // Save to Firestore in background (snapshot will be suppressed)
   try {
     await savePeriod(period);
@@ -1015,7 +1023,7 @@ window.setPayType = async function(pid, wid, payType) {
     setSyncStatus('error', 'Save failed');
   }
 };
- 
+
 window.addWorker = function() {
   if (!isAdmin) return;
   requireUnlock(() => {
@@ -1025,7 +1033,7 @@ window.addWorker = function() {
     openModal('modal-worker');
   });
 };
- 
+
 window.selectNewWorkerPayType = function(type) {
   const isFixed = type === 'fixed';
   document.getElementById('nw-pt-daily').classList.toggle('active', !isFixed);
@@ -1034,7 +1042,7 @@ window.selectNewWorkerPayType = function(type) {
   document.getElementById('nw-rate-label').textContent = isFixed ? 'Fixed Bi-Monthly Pay ($)' : 'Daily Rate ($)';
   document.getElementById('nw-rate').placeholder = isFixed ? 'e.g. 2500' : '180';
 };
- 
+
 window.saveNewWorker = async function() {
   const name = document.getElementById('nw-name').value.trim();
   if (!name) return;
@@ -1052,10 +1060,18 @@ window.saveNewWorker = async function() {
   if (!period.workers) period.workers = [];
   period.workers.push(worker);
   closeModal('modal-worker');
+  // Re-render immediately from local state
+  renderWorkers(period);
+  document.getElementById('sum-total').textContent = fmt(calcP(period));
+  document.getElementById('sum-workers').textContent = period.workers.length+' worker'+(period.workers.length!==1?'s':'');
+  renderHistoryList();
   setSyncStatus('syncing','Saving…');
-  await savePeriod(period);
+  try {
+    await savePeriod(period);
+    setSyncStatus('ok','Connected · Live sync active');
+  } catch(e) { setSyncStatus('error','Save failed'); }
 };
- 
+
 window.chipClick = async function(pid, y, m, startDay) {
   let period = periods.find(p=>p.id===pid);
   if (!period) {
@@ -1070,9 +1086,9 @@ window.chipClick = async function(pid, y, m, startDay) {
   loadPeriod(pid);
   document.getElementById('period-select').value = pid;
 };
- 
+
 function getEditPw() { return localStorage.getItem(PW_KEY) || DEFAULT_EDIT_PW; }
- 
+
 function requireUnlock(cb) {
   if (!isAdmin) return;
   if (isUnlocked) { if(cb) cb(); return; }
@@ -1082,7 +1098,7 @@ function requireUnlock(cb) {
   openModal('modal-pw');
   setTimeout(()=>document.getElementById('pw-input').focus(),150);
 }
- 
+
 window.submitPw = function() {
   const val = document.getElementById('pw-input').value;
   if (val===getEditPw()) {
@@ -1096,12 +1112,12 @@ window.submitPw = function() {
     setTimeout(()=>inp.classList.remove('shake'),400);
   }
 };
- 
+
 window.toggleLock = function() {
   if (!isAdmin) return;
   if (isUnlocked) setUnlocked(false); else requireUnlock(null);
 };
- 
+
 function setUnlocked(v) {
   isUnlocked = v;
   const badge=document.getElementById('lock-badge');
@@ -1117,7 +1133,7 @@ function setUnlocked(v) {
   if(currentPeriodId){const p=periods.find(x=>x.id===currentPeriodId);if(p)renderWorkers(p);}
   refreshSettings();
 }
- 
+
 window.openChangePassword = function() {
   requireUnlock(()=>{
     ['cpw-current','cpw-new','cpw-confirm'].forEach(id=>document.getElementById(id).value='');
@@ -1129,7 +1145,7 @@ window.openChangePassword = function() {
     setTimeout(()=>document.getElementById('cpw-current').focus(),150);
   });
 };
- 
+
 window.submitChangePw = function() {
   const curr=document.getElementById('cpw-current').value;
   const newPw=document.getElementById('cpw-new').value;
@@ -1146,7 +1162,7 @@ window.submitChangePw = function() {
   localStorage.setItem(PW_KEY,newPw);
   closeModal('modal-change-pw');
 };
- 
+
 window.checkPwStrength = function(pw) {
   const bar=document.getElementById('pw-strength-bar');
   const lbl=document.getElementById('pw-strength-label');
@@ -1157,11 +1173,11 @@ window.checkPwStrength = function(pw) {
   else if(medium){bar.className='pw-strength medium';lbl.textContent='Medium';}
   else{bar.className='pw-strength weak';lbl.textContent='Weak';}
 };
- 
+
 window.settingsToggleLock = function() {
   if(isUnlocked){setUnlocked(false);}else requireUnlock(()=>refreshSettings());
 };
- 
+
 function refreshSettings() {
   const lockText=document.getElementById('lock-status-text');
   const lockBtn=document.getElementById('settings-lock-btn');
@@ -1179,7 +1195,7 @@ function refreshSettings() {
   document.getElementById('settings-period-count').textContent=`${periods.length} bi-monthly period${periods.length!==1?'s':''} on record`;
   document.getElementById('settings-alltime-total').textContent=fmt(allTotal)+' across all periods';
 }
- 
+
 window.confirmClearAll = function() {
   const allTotal=periods.reduce((s,p)=>s+calcP(p),0);
   document.getElementById('clear-summary').textContent=`${periods.length} pay periods · ${periods.reduce((s,p)=>s+(p.workers||[]).length,0)} worker entries · ${fmt(allTotal)} total`;
@@ -1201,7 +1217,7 @@ window.executeClearAll = async function() {
   hideLoading();
   showView('current');
 };
- 
+
 window.openExportModal = function() {
   exportScope='current'; exportFormat='csv';
   selectExport('current'); selectFormat('csv');
@@ -1288,7 +1304,7 @@ window.doExport = function() {
     if(!win){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([buildPDF(ps,title)],{type:'text/html'}));a.download=`terragreenoak_${baseName}.html`;a.click();}
   }
 };
- 
+
 window.calNav = function(dir) { calBase=new Date(calBase.getFullYear(),calBase.getMonth()+dir,1); renderCal(); };
 function renderCal() {
   const today=new Date(), y=calBase.getFullYear(), m=calBase.getMonth();
@@ -1314,7 +1330,7 @@ function renderCal() {
       <span class="chip-dot"></span>${m+1}/16–${dim}${is2now?'<span class="badge-now">● Now</span>':''}
     </div>`;
 }
- 
+
 function tickClock() {
   const now=new Date();
   const d=now.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
@@ -1322,7 +1338,7 @@ function tickClock() {
   document.getElementById('live-clock').textContent=`${d} · ${t}`;
   document.getElementById('cal-date-label').textContent=now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
 }
- 
+
 window.showView = function(name) {
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
