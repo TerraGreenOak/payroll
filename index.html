@@ -208,7 +208,20 @@ select:focus{outline:1px solid var(--accent)}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading-overlay{position:fixed;inset:0;background:rgba(240,244,248,.85);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:300;font-family:'DM Mono',monospace;font-size:.78rem;color:var(--muted)}
 .loading-overlay.hidden{display:none}
-</style>
+
+/* ── DRAG TO REORDER ── */
+.drag-handle{display:flex;flex-direction:column;gap:2px;padding:4px 6px;cursor:grab;opacity:.35;flex-shrink:0;touch-action:none;user-select:none}
+.drag-handle:active{cursor:grabbing;opacity:.7}
+.drag-handle span{display:block;width:16px;height:2px;background:var(--muted);border-radius:1px}
+.worker-row.dragging{opacity:.4;background:var(--surface2)}
+.worker-row.drag-over{border-top:2px solid var(--accent)}
+.reorder-btn{background:transparent;border:1px solid var(--border);color:var(--muted);padding:3px 7px;border-radius:4px;font-size:.7rem;cursor:pointer;transition:all .12s;line-height:1}
+.reorder-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ── SAVE CONFIRMATION TOAST ── */
+#save-toast{position:fixed;bottom:82px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--success);color:#fff;padding:9px 18px;border-radius:20px;font-size:.8rem;font-weight:600;z-index:999;transition:transform .25s ease,opacity .25s ease;pointer-events:none;white-space:nowrap;opacity:0;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:6px}
+#save-toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+#save-toast svg{width:14px;height:14px}</style>
 </head>
 <body>
 
@@ -612,6 +625,11 @@ select:focus{outline:1px solid var(--accent)}
   </div>
 </div>
 
+<div id="save-toast">
+  <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+  Changes saved
+</div>
+
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
@@ -888,20 +906,27 @@ function renderWorkers(period) {
   if (!workers.length) { list.innerHTML='<div class="section-empty">No workers yet. Add one above.</div>'; return; }
   const ro = isUnlocked ? '' : 'readonly';
   const canEdit = isAdmin && isUnlocked;
-  list.innerHTML = workers.map(w => {
+  list.innerHTML = workers.map((w, idx) => {
     const t = calcW(w);
     const isFixed = w.payType === 'fixed';
     const rateLabel = isFixed ? 'Fixed Pay $' : 'Daily Rate $';
     const ratePlaceholder = isFixed ? 'Period amount' : '180';
-    return `<div class="worker-row" id="wr-${w.id}">
+    return `<div class="worker-row" id="wr-${w.id}" data-id="${w.id}" draggable="${canEdit}">
       <div class="worker-row-top">
         <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:0">
+          ${canEdit ? `<div class="drag-handle" title="Drag to reorder"><span></span><span></span><span></span></div>` : ''}
           <input class="worker-name-input" value="${esc(w.name)}" ${ro} placeholder="Name"
             onfocus="gateEdit(event,'${period.id}','${w.id}','name')"
             onchange="doUpdate('${period.id}','${w.id}','name',this.value)" style="max-width:180px"/>
           ${isFixed ? `<span class="fixed-badge">Fixed</span>` : ''}
         </div>
-        <span class="worker-total" id="wt-${w.id}">${fmt(t)}</span>
+        <div style="display:flex;align-items:center;gap:6px">
+          ${canEdit ? `
+            <button class="reorder-btn" onclick="moveWorker('${period.id}','${w.id}',-1)" title="Move up" ${idx===0?'disabled':''}>↑</button>
+            <button class="reorder-btn" onclick="moveWorker('${period.id}','${w.id}',1)" title="Move down" ${idx===workers.length-1?'disabled':''}>↓</button>
+          ` : ''}
+          <span class="worker-total" id="wt-${w.id}">${fmt(t)}</span>
+        </div>
       </div>
       ${canEdit ? `
       <div class="pay-type-toggle" style="margin-bottom:10px">
@@ -934,6 +959,9 @@ function renderWorkers(period) {
       ${canEdit ? `<div class="worker-row-bottom"><button class="btn-danger" onclick="removeWorker('${period.id}','${w.id}')">Remove</button></div>` : ''}
     </div>`;
   }).join('');
+
+  // Attach drag-and-drop if unlocked
+  if (canEdit) initDragAndDrop(period);
 }
 
 function renderHistoryList() {
@@ -979,6 +1007,7 @@ window.doUpdate = async function(pid, wid, field, value) {
   try {
     await savePeriod(period);
     setSyncStatus('ok','Connected · Live sync active');
+    showSaveToast();
   } catch(e) { setSyncStatus('error','Save failed'); }
 };
 
@@ -999,6 +1028,7 @@ window.removeWorker = async function(pid, wid) {
   try {
     await savePeriod(period);
     setSyncStatus('ok','Connected · Live sync active');
+    showSaveToast();
   } catch(e) { setSyncStatus('error','Save failed'); }
 };
 
@@ -1027,7 +1057,110 @@ window.setPayType = async function(pid, wid, payType) {
   }
 };
 
-window.addWorker = function() {
+window.moveWorker = async function(pid, wid, dir) {
+  if (!isAdmin || !isUnlocked) return;
+  const period = periods.find(p=>p.id===pid);
+  if (!period) return;
+  const workers = period.workers || [];
+  const idx = workers.findIndex(w=>w.id===wid);
+  const newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= workers.length) return;
+  // Swap
+  [workers[idx], workers[newIdx]] = [workers[newIdx], workers[idx]];
+  renderWorkers(period);
+  setSyncStatus('syncing','Saving…');
+  try {
+    await savePeriod(period);
+    setSyncStatus('ok','Connected · Live sync active');
+    showSaveToast();
+  } catch(e) { setSyncStatus('error','Save failed'); }
+};
+
+function initDragAndDrop(period) {
+  const list = document.getElementById('workers-list');
+  let dragSrc = null;
+
+  list.querySelectorAll('.worker-row').forEach(row => {
+    // Desktop drag events
+    row.addEventListener('dragstart', e => {
+      dragSrc = row;
+      row.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    row.addEventListener('dragend', () => {
+      row.classList.remove('dragging');
+      list.querySelectorAll('.worker-row').forEach(r => r.classList.remove('drag-over'));
+    });
+    row.addEventListener('dragover', e => {
+      e.preventDefault();
+      list.querySelectorAll('.worker-row').forEach(r => r.classList.remove('drag-over'));
+      if (row !== dragSrc) row.classList.add('drag-over');
+    });
+    row.addEventListener('drop', async e => {
+      e.preventDefault();
+      row.classList.remove('drag-over');
+      if (!dragSrc || dragSrc === row) return;
+      const workers = period.workers;
+      const fromId = dragSrc.dataset.id;
+      const toId   = row.dataset.id;
+      const fromIdx = workers.findIndex(w=>w.id===fromId);
+      const toIdx   = workers.findIndex(w=>w.id===toId);
+      if (fromIdx === -1 || toIdx === -1) return;
+      const [moved] = workers.splice(fromIdx, 1);
+      workers.splice(toIdx, 0, moved);
+      renderWorkers(period);
+      setSyncStatus('syncing','Saving…');
+      try {
+        await savePeriod(period);
+        setSyncStatus('ok','Connected · Live sync active');
+    showSaveToast();
+      } catch(e) { setSyncStatus('error','Save failed'); }
+    });
+
+    // Touch drag (mobile)
+    let touchStartY = 0, touchRow = null;
+    row.addEventListener('touchstart', e => {
+      if (!e.target.closest('.drag-handle')) return;
+      touchStartY = e.touches[0].clientY;
+      touchRow = row;
+      row.classList.add('dragging');
+    }, {passive:true});
+    row.addEventListener('touchmove', e => {
+      if (!touchRow) return;
+      e.preventDefault();
+      const y = e.touches[0].clientY;
+      const rows = [...list.querySelectorAll('.worker-row')];
+      list.querySelectorAll('.worker-row').forEach(r => r.classList.remove('drag-over'));
+      const target = rows.find(r => {
+        const rect = r.getBoundingClientRect();
+        return y >= rect.top && y <= rect.bottom && r !== touchRow;
+      });
+      if (target) target.classList.add('drag-over');
+    }, {passive:false});
+    row.addEventListener('touchend', async e => {
+      if (!touchRow) return;
+      touchRow.classList.remove('dragging');
+      const overRow = list.querySelector('.worker-row.drag-over');
+      list.querySelectorAll('.worker-row').forEach(r => r.classList.remove('drag-over'));
+      if (!overRow || overRow === touchRow) { touchRow = null; return; }
+      const workers = period.workers;
+      const fromIdx = workers.findIndex(w=>w.id===touchRow.dataset.id);
+      const toIdx   = workers.findIndex(w=>w.id===overRow.dataset.id);
+      if (fromIdx !== -1 && toIdx !== -1) {
+        const [moved] = workers.splice(fromIdx, 1);
+        workers.splice(toIdx, 0, moved);
+        renderWorkers(period);
+        setSyncStatus('syncing','Saving…');
+        try {
+          await savePeriod(period);
+          setSyncStatus('ok','Connected · Live sync active');
+    showSaveToast();
+        } catch(e2) { setSyncStatus('error','Save failed'); }
+      }
+      touchRow = null;
+    });
+  });
+}
   if (!isAdmin) return;
   requireUnlock(() => {
     ['nw-name','nw-rate','nw-days','nw-off','nw-bonus'].forEach(id=>document.getElementById(id).value='');
@@ -1072,6 +1205,7 @@ window.saveNewWorker = async function() {
   try {
     await savePeriod(period);
     setSyncStatus('ok','Connected · Live sync active');
+    showSaveToast();
   } catch(e) { setSyncStatus('error','Save failed'); }
 };
 
@@ -1355,6 +1489,14 @@ document.querySelectorAll('.modal-backdrop').forEach(m=>m.addEventListener('clic
 window.togglePwEye = function(inputId,btn){const inp=document.getElementById(inputId);inp.type=inp.type==='password'?'text':'password';btn.textContent=inp.type==='password'?'show':'hide';};
 function showLoading(msg){document.getElementById('loading-msg').textContent=msg||'Loading…';document.getElementById('loading-overlay').classList.remove('hidden');}
 function hideLoading(){document.getElementById('loading-overlay').classList.add('hidden');}
+
+let saveToastTimer;
+function showSaveToast() {
+  const t = document.getElementById('save-toast');
+  t.classList.add('show');
+  clearTimeout(saveToastTimer);
+  saveToastTimer = setTimeout(() => t.classList.remove('show'), 2000);
+}
 </script>
 </body>
 </html>
