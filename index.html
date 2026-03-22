@@ -9,6 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="TerraGreenOak">
 <meta name="theme-color" content="#2563eb">
 <title>TerraGreenOak Payroll</title>
+
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap');
 :root{--bg:#f0f4f8;--surface:#fff;--surface2:#f8fafc;--border:#dde3ec;--accent:#2563eb;--accent2:#0ea5e9;--text:#1e293b;--muted:#64748b;--danger:#ef4444;--success:#059669;--warn:#f59e0b;--radius:10px}
@@ -90,7 +91,7 @@ main{padding:14px;max-width:900px;margin:0 auto}
 /* ── PERIOD BAR ── */
 .period-bar{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
 .period-bar label{font-size:.7rem;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.05em}
-select{background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:7px 12px;font-family:'DM Mono',monospace;font-size:.8rem;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;min-width:180px}
+select{background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:7px 12px;font-family:'DM Mono',monospace;font-size:.8rem;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url(""data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;min-width:180px}
 select:focus{outline:1px solid var(--accent)}
 
 /* ── SUMMARY ── */
@@ -222,10 +223,11 @@ select:focus{outline:1px solid var(--accent)}
 #save-toast{position:fixed;bottom:82px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--success);color:#fff;padding:9px 18px;border-radius:20px;font-size:.8rem;font-weight:600;z-index:999;transition:transform .25s ease,opacity .25s ease;pointer-events:none;white-space:nowrap;opacity:0;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:6px}
 #save-toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 #save-toast svg{width:14px;height:14px}</style>
+
 </head>
 <body>
 
-<!-- ── LOGIN SCREEN ── -->
+<!-- LOGIN SCREEN -->
 <div id="login-screen">
   <div class="login-logo">TerraGreenOak</div>
   <div class="login-sub">Payroll System</div>
@@ -241,18 +243,18 @@ select:focus{outline:1px solid var(--accent)}
       <input class="login-input" id="login-password" type="password" placeholder="••••••••" autocomplete="current-password"
         onkeydown="if(event.key==='Enter')window.doLogin()"/>
     </div>
-    <button class="login-btn" id="login-btn" onclick="doLogin()">Sign In</button>
+    <button class="login-btn" id="login-btn" onclick="window.doLogin()">Sign In</button>
     <div class="login-err" id="login-err"></div>
   </div>
 </div>
 
-<!-- ── LOADING ── -->
+<!-- LOADING -->
 <div class="loading-overlay hidden" id="loading-overlay">
   <div class="spinner"></div>
   <span id="loading-msg">Loading payroll data…</span>
 </div>
 
-<!-- ── HEADER ── -->
+<!-- HEADER -->
 <header>
   <div class="header-left">
     <h1>TerraGreenOak</h1>
@@ -261,14 +263,14 @@ select:focus{outline:1px solid var(--accent)}
   <div class="header-right">
     <div class="clock-display" id="live-clock"></div>
     <div id="user-chip-wrap"></div>
-    <div class="lock-badge" id="lock-badge" onclick="toggleLock()">
+    <div class="lock-badge" id="lock-badge" onclick="window.toggleLock()">
       <svg id="lock-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
         <rect x="3" y="11" width="18" height="11" rx="2"/>
         <path d="M7 11V7a5 5 0 0110 0v4"/>
       </svg>
       <span id="lock-label">Locked</span>
     </div>
-    <button class="btn-primary btn-sm" onclick="openExportModal()">Export</button>
+    <button class="btn-primary btn-sm" onclick="window.openExportModal()">Export</button>
   </div>
 </header>
 
@@ -279,25 +281,22 @@ select:focus{outline:1px solid var(--accent)}
       <span class="sync-dot" id="sync-dot"></span>
       <span id="sync-msg">Connected · Live sync active</span>
     </div>
-
     <div class="cal-strip">
       <div class="cal-header">
-        <button class="cal-nav-btn" onclick="calNav(-1)">&#8249;</button>
+        <button class="cal-nav-btn" onclick="window.calNav(-1)">&#8249;</button>
         <div>
           <div class="cal-month-label" id="cal-month-label"></div>
           <div class="cal-live"><span class="cal-live-dot"></span><span id="cal-date-label"></span></div>
         </div>
-        <button class="cal-nav-btn" onclick="calNav(1)">&#8250;</button>
+        <button class="cal-nav-btn" onclick="window.calNav(1)">&#8250;</button>
       </div>
       <div class="cal-grid" id="cal-grid"></div>
       <div class="cal-period-bar" id="cal-period-bar"></div>
     </div>
-
     <div class="period-bar">
       <label>Period:</label>
-      <select id="period-select" onchange="loadPeriod(this.value)"></select>
+      <select id="period-select" onchange="window.loadPeriod(this.value)"></select>
     </div>
-
     <div class="summary-card">
       <div>
         <div class="summary-period" id="sum-label"></div>
@@ -310,11 +309,10 @@ select:focus{outline:1px solid var(--accent)}
         <div class="summary-badge" id="sum-days" style="display:none"></div>
       </div>
     </div>
-
     <div class="workers-section">
       <div class="workers-section-header">
         <span class="section-title">Workers</span>
-        <button class="btn-primary btn-sm" id="add-worker-btn" onclick="addWorker()" style="display:none">+ Add Worker</button>
+        <button class="btn-primary btn-sm" id="add-worker-btn" onclick="window.addWorker()" style="display:none">+ Add Worker</button>
       </div>
       <div id="workers-list"><div class="section-empty">Loading…</div></div>
     </div>
@@ -342,7 +340,6 @@ select:focus{outline:1px solid var(--accent)}
   <div class="view" id="view-settings">
     <p class="settings-page-title">Settings</p>
     <p class="settings-page-sub">Manage your account, security, and data.</p>
-
     <div class="settings-section">
       <div class="settings-section-title">👤 Account</div>
       <div class="settings-row">
@@ -351,11 +348,10 @@ select:focus{outline:1px solid var(--accent)}
           <div class="settings-row-sub" id="settings-role-text">—</div>
         </div>
         <div class="settings-row-right">
-          <button class="btn-ghost btn-sm" onclick="doSignOut()">Sign Out</button>
+          <button class="btn-ghost btn-sm" onclick="window.doSignOut()">Sign Out</button>
         </div>
       </div>
     </div>
-
     <div class="settings-section" id="admin-settings" style="display:none">
       <div class="settings-section-title">🔐 Security</div>
       <div class="settings-row">
@@ -364,7 +360,7 @@ select:focus{outline:1px solid var(--accent)}
           <div class="settings-row-sub" id="lock-status-text">App is currently locked</div>
         </div>
         <div class="settings-row-right">
-          <button class="btn-ghost btn-sm" id="settings-lock-btn" onclick="settingsToggleLock()">Unlock</button>
+          <button class="btn-ghost btn-sm" id="settings-lock-btn" onclick="window.settingsToggleLock()">Unlock</button>
         </div>
       </div>
       <div class="settings-row">
@@ -373,7 +369,7 @@ select:focus{outline:1px solid var(--accent)}
           <div class="settings-row-sub">Required to edit worker data</div>
         </div>
         <div class="settings-row-right">
-          <button class="btn-ghost btn-sm" onclick="openChangePassword()">Change</button>
+          <button class="btn-ghost btn-sm" onclick="window.openChangePassword()">Change</button>
         </div>
       </div>
       <div class="settings-row">
@@ -386,7 +382,6 @@ select:focus{outline:1px solid var(--accent)}
         </div>
       </div>
     </div>
-
     <div class="settings-section">
       <div class="settings-section-title">📤 Export Data</div>
       <div class="settings-row">
@@ -395,11 +390,10 @@ select:focus{outline:1px solid var(--accent)}
           <div class="settings-row-sub">CSV or PDF, current period or all history</div>
         </div>
         <div class="settings-row-right">
-          <button class="btn-primary btn-sm" onclick="openExportModal()">Export…</button>
+          <button class="btn-primary btn-sm" onclick="window.openExportModal()">Export…</button>
         </div>
       </div>
     </div>
-
     <div class="settings-section">
       <div class="settings-section-title">ℹ️ About</div>
       <div class="settings-row">
@@ -420,7 +414,6 @@ select:focus{outline:1px solid var(--accent)}
         </div>
       </div>
     </div>
-
     <div class="settings-section danger-zone" id="danger-zone-section" style="display:none">
       <div class="settings-section-title">⚠ Danger Zone</div>
       <div class="settings-row">
@@ -429,30 +422,30 @@ select:focus{outline:1px solid var(--accent)}
           <div class="settings-row-sub">Permanently delete all periods from the cloud</div>
         </div>
         <div class="settings-row-right">
-          <button class="btn-danger" onclick="confirmClearAll()">Clear All</button>
+          <button class="btn-danger" onclick="window.confirmClearAll()">Clear All</button>
         </div>
       </div>
     </div>
   </div>
 </main>
 
-<!-- BOTTOM NAV -->
+<!-- NAV -->
 <nav class="nav-bottom">
-  <button class="nav-btn active" id="nav-current" onclick="showView('current')">
+  <button class="nav-btn active" id="nav-current" onclick="window.showView('current')">
     <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
     Current
   </button>
-  <button class="nav-btn" id="nav-history" onclick="showView('history')">
+  <button class="nav-btn" id="nav-history" onclick="window.showView('history')">
     <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
     History
   </button>
-  <button class="nav-btn" id="nav-settings" onclick="showView('settings')">
+  <button class="nav-btn" id="nav-settings" onclick="window.showView('settings')">
     <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
     Settings
   </button>
 </nav>
 
-<!-- ── MODALS ── -->
+<!-- MODALS -->
 <div class="modal-backdrop" id="modal-pw">
   <div class="modal">
     <h2>Admin Password</h2>
@@ -460,15 +453,15 @@ select:focus{outline:1px solid var(--accent)}
     <div class="form-field">
       <label class="form-label">Password</label>
       <div class="pw-wrap">
-        <input class="form-input" id="pw-input" type="password" placeholder="••••••••"
-          onkeydown="if(event.key==='Enter')submitPw()" autocomplete="off"/>
-        <button class="pw-eye" onclick="togglePwEye('pw-input',this)">show</button>
+        <input class="form-input" id="pw-input" type="password" placeholder="········"
+          onkeydown="if(event.key==='Enter')window.submitPw()" autocomplete="off"/>
+        <button class="pw-eye" onclick="window.togglePwEye('pw-input',this)">show</button>
       </div>
       <div class="err-hint" id="pw-err">Incorrect password.</div>
     </div>
     <div class="modal-actions">
-      <button class="btn-ghost" onclick="closeModal('modal-pw')">Cancel</button>
-      <button class="btn-primary" onclick="submitPw()">Unlock</button>
+      <button class="btn-ghost" onclick="window.closeModal('modal-pw')">Cancel</button>
+      <button class="btn-primary" onclick="window.submitPw()">Unlock</button>
     </div>
   </div>
 </div>
@@ -481,15 +474,15 @@ select:focus{outline:1px solid var(--accent)}
       <label class="form-label">Current Password</label>
       <div class="pw-wrap">
         <input class="form-input" id="cpw-current" type="password" placeholder="Current password"/>
-        <button class="pw-eye" onclick="togglePwEye('cpw-current',this)">show</button>
+        <button class="pw-eye" onclick="window.togglePwEye('cpw-current',this)">show</button>
       </div>
       <div class="err-hint" id="cpw-current-err">Incorrect current password.</div>
     </div>
     <div class="form-field">
       <label class="form-label">New Password</label>
       <div class="pw-wrap">
-        <input class="form-input" id="cpw-new" type="password" placeholder="New password" oninput="checkPwStrength(this.value)"/>
-        <button class="pw-eye" onclick="togglePwEye('cpw-new',this)">show</button>
+        <input class="form-input" id="cpw-new" type="password" placeholder="New password" oninput="window.checkPwStrength(this.value)"/>
+        <button class="pw-eye" onclick="window.togglePwEye('cpw-new',this)">show</button>
       </div>
       <div class="pw-strength" id="pw-strength-bar"></div>
       <div class="pw-strength-label" id="pw-strength-label"></div>
@@ -498,14 +491,14 @@ select:focus{outline:1px solid var(--accent)}
       <label class="form-label">Confirm New Password</label>
       <div class="pw-wrap">
         <input class="form-input" id="cpw-confirm" type="password" placeholder="Repeat new password"
-          onkeydown="if(event.key==='Enter')submitChangePw()"/>
-        <button class="pw-eye" onclick="togglePwEye('cpw-confirm',this)">show</button>
+          onkeydown="if(event.key==='Enter')window.submitChangePw()"/>
+        <button class="pw-eye" onclick="window.togglePwEye('cpw-confirm',this)">show</button>
       </div>
       <div class="err-hint" id="cpw-match-err">Passwords do not match.</div>
     </div>
     <div class="modal-actions">
-      <button class="btn-ghost" onclick="closeModal('modal-change-pw')">Cancel</button>
-      <button class="btn-primary" onclick="submitChangePw()">Update Password</button>
+      <button class="btn-ghost" onclick="window.closeModal('modal-change-pw')">Cancel</button>
+      <button class="btn-primary" onclick="window.submitChangePw()">Update Password</button>
     </div>
   </div>
 </div>
@@ -518,8 +511,8 @@ select:focus{outline:1px solid var(--accent)}
     <div class="form-field">
       <label class="form-label">Pay Type</label>
       <div class="pay-type-select-wrap">
-        <button class="pay-type-select-btn active" id="nw-pt-daily" onclick="selectNewWorkerPayType('daily')">Daily Rate</button>
-        <button class="pay-type-select-btn" id="nw-pt-fixed" onclick="selectNewWorkerPayType('fixed')">Fixed Bi-Monthly</button>
+        <button class="pay-type-select-btn active" id="nw-pt-daily" onclick="window.selectNewWorkerPayType('daily')">Daily Rate</button>
+        <button class="pay-type-select-btn" id="nw-pt-fixed" onclick="window.selectNewWorkerPayType('fixed')">Fixed Bi-Monthly</button>
       </div>
     </div>
     <div class="form-field"><label class="form-label" id="nw-rate-label">Daily Rate ($)</label><input class="form-input" id="nw-rate" type="number" placeholder="180" min="0"/></div>
@@ -529,8 +522,8 @@ select:focus{outline:1px solid var(--accent)}
     </div>
     <div class="form-field"><label class="form-label">Bonus ($)</label><input class="form-input" id="nw-bonus" type="number" placeholder="0" min="0"/></div>
     <div class="modal-actions">
-      <button class="btn-ghost" onclick="closeModal('modal-worker')">Cancel</button>
-      <button class="btn-primary" onclick="saveNewWorker()">Add Worker</button>
+      <button class="btn-ghost" onclick="window.closeModal('modal-worker')">Cancel</button>
+      <button class="btn-primary" onclick="window.saveNewWorker()">Add Worker</button>
     </div>
   </div>
 </div>
@@ -539,12 +532,12 @@ select:focus{outline:1px solid var(--accent)}
   <div class="modal">
     <h2>Export Data</h2>
     <p class="sub">Choose what to include and your preferred format.</p>
-    <div class="export-option selected" id="export-opt-current" onclick="selectExport('current')">
+    <div class="export-option selected" id="export-opt-current" onclick="window.selectExport('current')">
       <input type="radio" class="export-radio" name="export-scope" checked/>
       <div class="export-option-icon"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>
       <div><div class="export-option-title">Current Period</div><div class="export-option-sub" id="export-current-label">Export the selected period</div></div>
     </div>
-    <div class="export-option" id="export-opt-choose" onclick="selectExport('choose')">
+    <div class="export-option" id="export-opt-choose" onclick="window.selectExport('choose')">
       <input type="radio" class="export-radio" name="export-scope"/>
       <div class="export-option-icon"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
       <div><div class="export-option-title">Choose Periods</div><div class="export-option-sub" id="export-choose-label">Pick specific periods</div></div>
@@ -553,13 +546,13 @@ select:focus{outline:1px solid var(--accent)}
       <div style="padding:7px 12px;background:var(--surface2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
         <span style="font-family:'DM Mono',monospace;font-size:.63rem;color:var(--muted);text-transform:uppercase" id="export-check-count">0 selected</span>
         <div style="display:flex;gap:12px">
-          <span style="font-family:'DM Mono',monospace;font-size:.68rem;color:var(--accent);cursor:pointer;font-weight:600" onclick="checkAllPeriods(true)">All</span>
-          <span style="font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);cursor:pointer" onclick="checkAllPeriods(false)">None</span>
+          <span style="font-family:'DM Mono',monospace;font-size:.68rem;color:var(--accent);cursor:pointer;font-weight:600" onclick="window.checkAllPeriods(true)">All</span>
+          <span style="font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);cursor:pointer" onclick="window.checkAllPeriods(false)">None</span>
         </div>
       </div>
       <div id="export-period-checks" style="max-height:160px;overflow-y:auto"></div>
     </div>
-    <div class="export-option" id="export-opt-all" onclick="selectExport('all')" style="margin-top:8px">
+    <div class="export-option" id="export-opt-all" onclick="window.selectExport('all')" style="margin-top:8px">
       <input type="radio" class="export-radio" name="export-scope"/>
       <div class="export-option-icon"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
       <div><div class="export-option-title">All Historical Data</div><div class="export-option-sub" id="export-all-label">Every period ever recorded</div></div>
@@ -567,19 +560,19 @@ select:focus{outline:1px solid var(--accent)}
     <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
       <div class="form-label" style="margin-bottom:8px">Format</div>
       <div style="display:flex;gap:8px">
-        <div id="fmt-csv" onclick="selectFormat('csv')" style="flex:1;border:1px solid var(--accent);border-radius:7px;padding:9px 12px;cursor:pointer;background:rgba(37,99,235,.07);text-align:center">
+        <div id="fmt-csv" onclick="window.selectFormat('csv')" style="flex:1;border:1px solid var(--accent);border-radius:7px;padding:9px 12px;cursor:pointer;background:rgba(37,99,235,.07);text-align:center">
           <div style="font-weight:600;font-size:.85rem;color:var(--accent)">CSV</div>
           <div style="font-size:.68rem;color:var(--muted);margin-top:2px">Spreadsheet</div>
         </div>
-        <div id="fmt-pdf" onclick="selectFormat('pdf')" style="flex:1;border:1px solid var(--border);border-radius:7px;padding:9px 12px;cursor:pointer;background:var(--surface2);text-align:center">
+        <div id="fmt-pdf" onclick="window.selectFormat('pdf')" style="flex:1;border:1px solid var(--border);border-radius:7px;padding:9px 12px;cursor:pointer;background:var(--surface2);text-align:center">
           <div style="font-weight:600;font-size:.85rem;color:var(--muted)">PDF</div>
           <div style="font-size:.68rem;color:var(--muted);margin-top:2px">Print-ready</div>
         </div>
       </div>
     </div>
     <div class="modal-actions">
-      <button class="btn-ghost" onclick="closeModal('modal-export')">Cancel</button>
-      <button class="btn-primary" id="export-download-btn" onclick="doExport()">Download CSV</button>
+      <button class="btn-ghost" onclick="window.closeModal('modal-export')">Cancel</button>
+      <button class="btn-primary" id="export-download-btn" onclick="window.doExport()">Download CSV</button>
     </div>
   </div>
 </div>
@@ -593,22 +586,24 @@ select:focus{outline:1px solid var(--accent)}
       <div style="font-size:.78rem;color:var(--text)" id="clear-summary">All periods and worker records</div>
     </div>
     <div class="modal-actions">
-      <button class="btn-ghost" onclick="closeModal('modal-clear-step1')">Cancel</button>
-      <button class="btn-danger" onclick="clearStep2()">Yes, Continue →</button>
+      <button class="btn-ghost" onclick="window.closeModal('modal-clear-step1')">Cancel</button>
+      <button class="btn-danger" onclick="window.clearStep2()">→ Yes, Continue</button>
     </div>
   </div>
 </div>
+
 <div class="modal-backdrop" id="modal-clear-step2">
   <div class="modal">
     <h2 style="color:var(--danger)">Are You Certain?</h2>
     <p class="sub">There is no backup. This data will be gone from the cloud forever.</p>
     <div style="background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:12px 14px;font-size:.82rem;color:var(--danger)">❌ All pay history will be permanently lost.</div>
     <div class="modal-actions">
-      <button class="btn-ghost" onclick="closeModal('modal-clear-step2')">Go Back</button>
-      <button class="btn-danger" onclick="clearStep3()">I Understand →</button>
+      <button class="btn-ghost" onclick="window.closeModal('modal-clear-step2')">Go Back</button>
+      <button class="btn-danger" onclick="window.clearStep3()">I Understand →</button>
     </div>
   </div>
 </div>
+
 <div class="modal-backdrop" id="modal-clear-step3">
   <div class="modal">
     <h2 style="color:var(--danger)">Final Confirmation</h2>
@@ -616,11 +611,11 @@ select:focus{outline:1px solid var(--accent)}
     <div class="form-field">
       <input class="form-input" id="clear-confirm-input" placeholder="Type DELETE to confirm"
         oninput="document.getElementById('clear-exec-btn').disabled = this.value !== 'DELETE'"
-        onkeydown="if(event.key==='Enter'&&this.value==='DELETE')executeClearAll()"/>
+        onkeydown="if(event.key==='Enter'&&this.value==='DELETE')window.executeClearAll()"/>
     </div>
     <div class="modal-actions">
-      <button class="btn-ghost" onclick="closeModal('modal-clear-step3');document.getElementById('clear-confirm-input').value='';document.getElementById('clear-exec-btn').disabled=true">Cancel</button>
-      <button class="btn-danger" id="clear-exec-btn" disabled onclick="executeClearAll()">Delete Everything</button>
+      <button class="btn-ghost" onclick="window.closeModal('modal-clear-step3');document.getElementById('clear-confirm-input').value='';document.getElementById('clear-exec-btn').disabled=true">Cancel</button>
+      <button class="btn-danger" id="clear-exec-btn" disabled onclick="window.executeClearAll()">Delete Everything</button>
     </div>
   </div>
 </div>
