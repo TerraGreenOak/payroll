@@ -239,7 +239,7 @@ select:focus{outline:1px solid var(--accent)}
     <div class="login-field">
       <label class="login-label">Password</label>
       <input class="login-input" id="login-password" type="password" placeholder="••••••••" autocomplete="current-password"
-        onkeydown="if(event.key==='Enter')doLogin()"/>
+        onkeydown="if(event.key==='Enter')window.doLogin()"/>
     </div>
     <button class="login-btn" id="login-btn" onclick="doLogin()">Sign In</button>
     <div class="login-err" id="login-err"></div>
@@ -247,7 +247,7 @@ select:focus{outline:1px solid var(--accent)}
 </div>
 
 <!-- ── LOADING ── -->
-<div class="loading-overlay" id="loading-overlay">
+<div class="loading-overlay hidden" id="loading-overlay">
   <div class="spinner"></div>
   <span id="loading-msg">Loading payroll data…</span>
 </div>
