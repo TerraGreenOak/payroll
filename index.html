@@ -986,6 +986,9 @@ window.removeWorker = async function(pid, wid) {
   if (!isAdmin || !isUnlocked) return;
   const period = periods.find(p=>p.id===pid);
   if (!period) return;
+  const worker = (period.workers||[]).find(w=>w.id===wid);
+  if (!worker) return;
+  if (!confirm(`Remove "${worker.name}" from this period?\n\nThis cannot be undone.`)) return;
   // Update local state and re-render immediately
   period.workers = (period.workers||[]).filter(w=>w.id!==wid);
   renderWorkers(period);
@@ -1058,7 +1061,7 @@ window.saveNewWorker = async function() {
     bonus:   parseFloat(document.getElementById('nw-bonus').value)||0,
   };
   if (!period.workers) period.workers = [];
-  period.workers.push(worker);
+  period.workers.unshift(worker);
   closeModal('modal-worker');
   // Re-render immediately from local state
   renderWorkers(period);
