@@ -31,15 +31,28 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
 .login-btn:hover{background:#1d4ed8}
 .login-btn:disabled{opacity:.5;cursor:not-allowed}
 .login-err{font-size:.75rem;color:var(--danger);margin-top:8px;text-align:center;min-height:18px}
-.login-role-badge{display:inline-flex;align-items:center;gap:5px;font-family:'DM Mono',monospace;font-size:.65rem;padding:3px 8px;border-radius:10px;margin-top:14px;text-align:center;width:100%;justify-content:center}
-.login-role-badge.admin{background:rgba(37,99,235,.1);color:var(--accent);border:1px solid rgba(37,99,235,.2)}
-.login-role-badge.viewer{background:rgba(14,165,233,.1);color:var(--accent2);border:1px solid rgba(14,165,233,.2)}
 
 /* ── SYNC STATUS ── */
 .sync-dot{width:7px;height:7px;border-radius:50%;background:var(--success);display:inline-block;margin-right:4px}
 .sync-dot.syncing{background:var(--warn);animation:pulse 1s infinite}
 .sync-dot.error{background:var(--danger)}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ── SAVE BAR ── */
+#save-bar{position:sticky;top:57px;z-index:99;display:none;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;background:#fff7ed;border-bottom:2px solid var(--warn);animation:slideDown .2s ease}
+#save-bar.visible{display:flex}
+#save-bar.saved{background:#f0fdf4;border-color:var(--success)}
+@keyframes slideDown{from{transform:translateY(-100%);opacity:0}to{transform:translateY(0);opacity:1}}
+.save-bar-msg{font-family:'DM Mono',monospace;font-size:.72rem;color:#92400e;display:flex;align-items:center;gap:6px}
+#save-bar.saved .save-bar-msg{color:var(--success)}
+.save-dot{width:7px;height:7px;border-radius:50%;background:var(--warn);animation:pulse 1s infinite;flex-shrink:0}
+#save-bar.saved .save-dot{background:var(--success);animation:none}
+.save-bar-actions{display:flex;gap:7px}
+.btn-save{background:var(--warn);color:#fff;border:none;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:600;padding:7px 16px;cursor:pointer;transition:all .25s}
+.btn-save:hover{background:#d97706;transform:translateY(-1px)}
+.btn-save.saved{background:var(--success);cursor:default;transform:none}
+.btn-discard{background:transparent;color:#92400e;border:1px solid #f59e0b88;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:.8rem;padding:7px 12px;cursor:pointer;transition:all .15s}
+.btn-discard:hover{background:#fef3c7}
 
 /* ── HEADER ── */
 header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 16px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;gap:10px}
@@ -115,6 +128,7 @@ select:focus{outline:1px solid var(--accent)}
 .worker-name-input{background:transparent;border:none;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:600;width:100%;max-width:200px;padding:3px 6px;border-radius:4px;border:1px solid transparent;transition:border .15s}
 .worker-name-input:focus{outline:none;border-color:var(--accent);background:var(--surface2)}
 .worker-name-input[readonly]{cursor:default}
+.worker-name-input.dirty{border-color:var(--warn)!important;background:#fffbeb!important}
 .worker-total{font-family:'DM Mono',monospace;font-size:.95rem;font-weight:500;color:var(--success);white-space:nowrap}
 .worker-fields{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
 @media(max-width:500px){.worker-fields{grid-template-columns:repeat(2,1fr)}}
@@ -123,8 +137,38 @@ select:focus{outline:1px solid var(--accent)}
 .field-input{background:var(--surface2);border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:'DM Mono',monospace;font-size:.82rem;padding:6px 8px;width:100%;transition:border .15s}
 .field-input:focus{outline:none;border-color:var(--accent)}
 .field-input[readonly]{cursor:default;opacity:.65}
+.field-input.dirty{border-color:var(--warn)!important;background:#fffbeb!important}
 .worker-row-bottom{display:flex;align-items:center;justify-content:flex-end;margin-top:8px}
 .section-empty{padding:20px 15px;color:var(--muted);font-size:.82rem;text-align:center}
+
+/* ── HISTORY TABS ── */
+.history-tab-bar{display:flex;gap:0;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:14px;background:var(--surface)}
+.history-tab{flex:1;padding:9px 14px;font-family:'DM Mono',monospace;font-size:.72rem;text-align:center;cursor:pointer;background:transparent;color:var(--muted);border:none;border-radius:0;transition:all .15s;font-weight:500;text-transform:uppercase;letter-spacing:.05em}
+.history-tab.active{background:var(--accent);color:#fff;font-weight:600}
+
+/* ── WEEKLY REPORT ── */
+.weekly-section{margin-bottom:18px}
+.weekly-section-header{background:linear-gradient(135deg,#eff6ff,#e0f2fe);border:1px solid var(--border);border-left:3px solid var(--accent2);border-radius:var(--radius) var(--radius) 0 0;padding:11px 15px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none}
+.weekly-section-header:hover{background:linear-gradient(135deg,#dbeafe,#bae6fd)}
+.weekly-header-left{display:flex;align-items:center;gap:8px}
+.weekly-period-label{font-family:'DM Mono',monospace;font-size:.8rem;color:var(--accent);font-weight:600}
+.weekly-date-range{font-size:.7rem;color:var(--muted);margin-top:1px}
+.weekly-total{font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--success)}
+.weekly-chevron{font-size:.8rem;color:var(--muted);transition:transform .2s}
+.weekly-chevron.open{transform:rotate(180deg)}
+.weekly-body{display:none;border:1px solid var(--border);border-top:none;border-radius:0 0 var(--radius) var(--radius);overflow:hidden}
+.weekly-body.open{display:block}
+.weekly-worker-row{display:flex;align-items:center;padding:9px 15px;border-bottom:1px solid var(--border);gap:10px;flex-wrap:wrap}
+.weekly-worker-row:last-child{border-bottom:none}
+.weekly-worker-name{font-size:.88rem;font-weight:600;flex:1;min-width:100px}
+.weekly-worker-stats{display:flex;gap:12px;flex-wrap:wrap}
+.weekly-stat{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:1px}
+.weekly-stat span:last-child{color:var(--text);font-weight:500}
+.weekly-worker-pay{font-family:'DM Mono',monospace;font-size:.88rem;font-weight:600;color:var(--success);text-align:right;min-width:60px}
+.weekly-footer{display:flex;align-items:center;justify-content:space-between;padding:9px 15px;background:var(--surface2);border-top:2px solid var(--border)}
+.weekly-footer-label{font-family:'DM Mono',monospace;font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+.weekly-footer-total{font-family:'DM Serif Display',serif;font-size:1.15rem;color:var(--accent)}
+.weekly-badge{font-family:'DM Mono',monospace;font-size:.6rem;padding:2px 7px;border-radius:8px;background:rgba(14,165,233,.1);border:1px solid rgba(14,165,233,.25);color:var(--accent2)}
 
 /* ── HISTORY ── */
 .history-view{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
@@ -259,6 +303,18 @@ select:focus{outline:1px solid var(--accent)}
   </div>
 </header>
 
+<!-- ── SAVE BAR ── -->
+<div id="save-bar">
+  <div class="save-bar-msg">
+    <span class="save-dot"></span>
+    <span id="save-bar-text">Unsaved changes</span>
+  </div>
+  <div class="save-bar-actions">
+    <button class="btn-discard" onclick="discardChanges()">Discard</button>
+    <button class="btn-save" onclick="commitSave()">Save Changes</button>
+  </div>
+</div>
+
 <main>
   <!-- CURRENT VIEW -->
   <div class="view active" id="view-current">
@@ -322,7 +378,22 @@ select:focus{outline:1px solid var(--accent)}
         <div style="font-size:.68rem;color:var(--muted);margin-top:2px" id="history-period-count"></div>
       </div>
     </div>
-    <div class="history-view" id="history-list"></div>
+
+    <!-- Tab bar -->
+    <div class="history-tab-bar">
+      <button class="history-tab active" id="tab-periods" onclick="switchHistoryTab('periods')">Periods</button>
+      <button class="history-tab" id="tab-weekly" onclick="switchHistoryTab('weekly')">Weekly Report</button>
+    </div>
+
+    <!-- Periods list -->
+    <div id="history-periods-panel">
+      <div class="history-view" id="history-list"></div>
+    </div>
+
+    <!-- Weekly report -->
+    <div id="history-weekly-panel" style="display:none">
+      <div id="weekly-report-list"></div>
+    </div>
   </div>
 
   <!-- SETTINGS VIEW -->
@@ -637,20 +708,147 @@ const EDITOR_EMAILS = [
 const PW_KEY = 'tgo_edit_pw';
 const DEFAULT_EDIT_PW = 'Happy6rocky';
 
-let currentUser   = null;
-let isAdmin       = false;
-let isOwner       = false;
-let isUnlocked    = false;
-let pwCallback    = null;
+let currentUser     = null;
+let isAdmin         = false;
+let isOwner         = false;
+let isUnlocked      = false;
+let pwCallback      = null;
 let currentPeriodId = null;
-let periods       = [];
-let unsubscribe   = null;
-let calBase       = new Date();
-let exportScope   = 'current';
-let exportFormat  = 'csv';
+let periods         = [];
+let unsubscribe     = null;
+let calBase         = new Date();
+let exportScope     = 'current';
+let exportFormat    = 'csv';
 let suppressSnapshot = false;
-let pendingSaves = 0;
+let pendingSaves    = 0;
 
+// ── PENDING CHANGES SYSTEM ──
+// pendingChanges holds staged edits not yet saved to Firestore
+// Structure: { [periodId]: { workers: { [workerId]: { field: value } } } }
+let pendingChanges  = {};
+let hasPending      = false;
+
+function stagePendingChange(pid, wid, field, value) {
+  if (!pendingChanges[pid]) pendingChanges[pid] = { workers: {} };
+  if (!pendingChanges[pid].workers[wid]) pendingChanges[pid].workers[wid] = {};
+  pendingChanges[pid].workers[wid][field] = value;
+  hasPending = true;
+  showSaveBar();
+}
+
+function clearPendingChanges() {
+  pendingChanges = {};
+  hasPending = false;
+  hideSaveBar();
+}
+
+function showSaveBar() {
+  const bar = document.getElementById('save-bar');
+  bar.classList.remove('saved');
+  bar.classList.add('visible');
+  document.getElementById('save-bar-text').textContent = 'Unsaved changes — review before saving';
+  // Update dirty styling
+  markDirtyFields();
+}
+
+function hideSaveBar() {
+  const bar = document.getElementById('save-bar');
+  bar.classList.remove('visible');
+  clearDirtyFields();
+}
+
+function markDirtyFields() {
+  // Mark inputs as dirty based on pendingChanges
+  document.querySelectorAll('.field-input, .worker-name-input').forEach(el => {
+    el.classList.remove('dirty');
+  });
+  Object.entries(pendingChanges).forEach(([pid, pdata]) => {
+    Object.entries(pdata.workers || {}).forEach(([wid, fields]) => {
+      Object.keys(fields).forEach(field => {
+        const row = document.getElementById('wr-' + wid);
+        if (row) {
+          const inputs = row.querySelectorAll('.field-input, .worker-name-input');
+          inputs.forEach(inp => inp.classList.add('dirty'));
+        }
+      });
+    });
+  });
+}
+
+function clearDirtyFields() {
+  document.querySelectorAll('.field-input.dirty, .worker-name-input.dirty').forEach(el => {
+    el.classList.remove('dirty');
+  });
+}
+
+window.commitSave = async function() {
+  if (!hasPending) return;
+  const bar = document.getElementById('save-bar');
+  document.getElementById('save-bar-text').textContent = 'Saving…';
+
+  // Apply all pending changes to local periods state and save
+  const saveTasks = [];
+  for (const [pid, pdata] of Object.entries(pendingChanges)) {
+    const period = periods.find(p => p.id === pid);
+    if (!period) continue;
+    for (const [wid, fields] of Object.entries(pdata.workers || {})) {
+      const worker = (period.workers || []).find(w => w.id === wid);
+      if (!worker) continue;
+      Object.assign(worker, fields);
+    }
+    saveTasks.push(savePeriod(period));
+  }
+
+  const saveBtn = document.querySelector('.btn-save');
+  try {
+    await Promise.all(saveTasks);
+    // Flash the button green
+    if (saveBtn) {
+      saveBtn.classList.add('saved');
+      saveBtn.textContent = '✓ Saved';
+    }
+    clearPendingChanges();
+    bar.classList.add('visible', 'saved');
+    document.getElementById('save-bar-text').textContent = '✓ All changes saved';
+    clearDirtyFields();
+    // Re-render totals
+    if (currentPeriodId) {
+      const p = periods.find(x => x.id === currentPeriodId);
+      if (p) {
+        document.getElementById('sum-total').textContent = fmt(calcP(p));
+        document.getElementById('sum-workers').textContent = (p.workers||[]).length + ' worker' + ((p.workers||[]).length !== 1 ? 's' : '');
+      }
+    }
+    setSyncStatus('ok', 'Connected · Live sync active');
+    // Hide bar and reset button after 2.5s
+    setTimeout(() => {
+      bar.classList.remove('visible', 'saved');
+      if (saveBtn) {
+        saveBtn.classList.remove('saved');
+        saveBtn.textContent = 'Save Changes';
+      }
+    }, 2500);
+  } catch(e) {
+    setSyncStatus('error', 'Save failed');
+    document.getElementById('save-bar-text').textContent = '⚠ Save failed — try again';
+    if (saveBtn) {
+      saveBtn.classList.remove('saved');
+      saveBtn.textContent = 'Save Changes';
+    }
+  }
+};
+
+window.discardChanges = function() {
+  clearPendingChanges();
+  hasPending = false;
+  // Re-render from original (un-modified) data
+  if (currentPeriodId) {
+    const p = periods.find(x => x.id === currentPeriodId);
+    if (p) renderWorkers(p);
+  }
+};
+
+// ── AUTH ──
 window.doLogin = async function() {
   const email = document.getElementById('login-email').value.trim();
   const pass  = document.getElementById('login-password').value;
@@ -724,16 +922,14 @@ function startListener() {
       periods.sort((a,b) => a.id.localeCompare(b.id));
       hideLoading();
       setSyncStatus('ok', 'Connected · Live sync active');
-      if (suppressSnapshot) {
-        // Local edit in progress — data is already correct on screen, skip all re-renders
-        return;
-      }
+      if (suppressSnapshot) return;
       if (initialLoad) {
         initialLoad = false;
         onPeriodsLoaded();
       } else {
         renderPeriodSelect();
         renderHistoryList();
+        renderWeeklyReport();
         if (currentPeriodId) {
           const p = periods.find(x=>x.id===currentPeriodId);
           if (p) renderWorkers(p);
@@ -763,6 +959,7 @@ async function onPeriodsLoaded() {
   await ensureCurrentPeriod();
   renderPeriodSelect();
   renderHistoryList();
+  renderWeeklyReport();
   const tm = todayMeta();
   const cur = periods.find(p=>p.id===tm.id) || periods[periods.length-1];
   if (cur) {
@@ -800,7 +997,6 @@ async function savePeriod(period) {
     pendingSaves--;
     if (pendingSaves <= 0) {
       pendingSaves = 0;
-      // Keep suppressed briefly so the echo snapshot from this write is ignored
       setTimeout(() => { suppressSnapshot = false; }, 300);
     }
   }
@@ -898,7 +1094,7 @@ function renderWorkers(period) {
         <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:0">
           <input class="worker-name-input" value="${esc(w.name)}" ${ro} placeholder="Name"
             onfocus="gateEdit(event,'${period.id}','${w.id}','name')"
-            onchange="doUpdate('${period.id}','${w.id}','name',this.value)" style="max-width:180px"/>
+            oninput="stageUpdate('${period.id}','${w.id}','name',this.value)" style="max-width:180px"/>
           ${isFixed ? `<span class="fixed-badge">Fixed</span>` : ''}
         </div>
         <span class="worker-total" id="wt-${w.id}">${fmt(t)}</span>
@@ -916,25 +1112,42 @@ function renderWorkers(period) {
         <div class="field-group"><span class="field-label">Days Worked</span>
           <input class="field-input" type="number" value="${w.days}" min="0" step="0.5" ${ro}
             onfocus="gateEdit(event,'${period.id}','${w.id}','days')"
-            onchange="doUpdate('${period.id}','${w.id}','days',parseFloat(this.value)||0)"/></div>` : ''}
+            oninput="stageUpdate('${period.id}','${w.id}','days',parseFloat(this.value)||0)"/></div>` : ''}
         <div class="field-group"><span class="field-label">${rateLabel}</span>
           <input class="field-input" type="number" value="${w.rate}" min="0" ${ro} placeholder="${ratePlaceholder}"
             onfocus="gateEdit(event,'${period.id}','${w.id}','rate')"
-            onchange="doUpdate('${period.id}','${w.id}','rate',parseFloat(this.value)||0)"/></div>
+            oninput="stageUpdate('${period.id}','${w.id}','rate',parseFloat(this.value)||0)"/></div>
         ${!isFixed ? `
         <div class="field-group"><span class="field-label">Days Off</span>
           <input class="field-input" type="number" value="${w.daysOff}" min="0" step="0.5" ${ro}
             onfocus="gateEdit(event,'${period.id}','${w.id}','daysOff')"
-            onchange="doUpdate('${period.id}','${w.id}','daysOff',parseFloat(this.value)||0)"/></div>` : ''}
+            oninput="stageUpdate('${period.id}','${w.id}','daysOff',parseFloat(this.value)||0)"/></div>` : ''}
         <div class="field-group"><span class="field-label">Bonus $</span>
           <input class="field-input" type="number" value="${w.bonus||0}" min="0" ${ro}
             onfocus="gateEdit(event,'${period.id}','${w.id}','bonus')"
-            onchange="doUpdate('${period.id}','${w.id}','bonus',parseFloat(this.value)||0)"/></div>
+            oninput="stageUpdate('${period.id}','${w.id}','bonus',parseFloat(this.value)||0)"/></div>
       </div>
       ${canEdit ? `<div class="worker-row-bottom"><button class="btn-danger" onclick="removeWorker('${period.id}','${w.id}')">Remove</button></div>` : ''}
     </div>`;
   }).join('');
 }
+
+// Stage a change locally without saving — updates live total preview
+window.stageUpdate = function(pid, wid, field, value) {
+  if (!isAdmin || !isUnlocked) return;
+  // Update local period state for live preview of totals
+  const period = periods.find(p=>p.id===pid);
+  if (!period) return;
+  const worker = (period.workers||[]).find(w=>w.id===wid);
+  if (!worker) return;
+  worker[field] = value;
+  // Update live total display
+  const wtEl = document.getElementById('wt-'+wid);
+  if (wtEl) wtEl.textContent = fmt(calcW(worker));
+  document.getElementById('sum-total').textContent = fmt(calcP(period));
+  // Stage the change
+  stagePendingChange(pid, wid, field, value);
+};
 
 function renderHistoryList() {
   const allTotal = periods.reduce((s,p)=>s+calcP(p),0);
@@ -955,6 +1168,133 @@ function renderHistoryList() {
   }).join('');
 }
 
+// ── WEEKLY REPORT ──
+// Each bi-monthly period is already ~a pay period. We group pairs of consecutive
+// periods within the same calendar month to build a "monthly" view, and label
+// each half as Week A (1st–15th) and Week B (16th–end).  The report shows
+// every worker's details per period and a period total.
+
+function renderWeeklyReport() {
+  const container = document.getElementById('weekly-report-list');
+  if (!container) return;
+  if (!periods.length) {
+    container.innerHTML = '<div class="section-empty" style="padding:20px">No data yet.</div>';
+    return;
+  }
+
+  // Group periods into months
+  const monthMap = {};
+  [...periods].forEach(p => {
+    // Period id format: YYMMa or YYMMb
+    const monthKey = p.id.slice(0, 4); // e.g. "2603"
+    if (!monthMap[monthKey]) monthMap[monthKey] = [];
+    monthMap[monthKey].push(p);
+  });
+
+  const sortedMonthKeys = Object.keys(monthMap).sort((a,b) => b.localeCompare(a));
+  const MONTHS = ['','January','February','March','April','May','June','July','August','September','October','November','December'];
+  const tm = todayMeta();
+
+  container.innerHTML = sortedMonthKeys.map(mk => {
+    const monthPeriods = monthMap[mk].sort((a,b) => a.id.localeCompare(b.id));
+    const yy = parseInt('20' + mk.slice(0,2));
+    const mm = parseInt(mk.slice(2,4));
+    const monthName = MONTHS[mm];
+    const monthTotal = monthPeriods.reduce((s,p) => s + calcP(p), 0);
+    const isCurrentMonth = monthPeriods.some(p => p.id === tm.id);
+
+    const periodsHtml = monthPeriods.map(p => {
+      const isNow = p.id === tm.id;
+      const halfLabel = p.id.endsWith('a') ? 'First Half (1–15)' : `Second Half (16–end)`;
+      const periodTotal = calcP(p);
+      const workerRows = (p.workers||[]).map(w => {
+        const pay = calcW(w);
+        const isFixed = w.payType === 'fixed';
+        const statsDays = isFixed
+          ? `<div class="weekly-stat"><span>Type</span><span>Fixed</span></div>
+             <div class="weekly-stat"><span>Rate</span><span>${fmt(w.rate)}</span></div>`
+          : `<div class="weekly-stat"><span>Days</span><span>${w.days}</span></div>
+             <div class="weekly-stat"><span>Rate</span><span>${fmt(w.rate)}</span></div>
+             ${(w.daysOff||0) > 0 ? `<div class="weekly-stat"><span>Off</span><span style="color:var(--danger)">${w.daysOff}</span></div>` : ''}
+             ${(w.bonus||0) > 0 ? `<div class="weekly-stat"><span>Bonus</span><span style="color:var(--accent2)">${fmt(w.bonus)}</span></div>` : ''}`;
+        return `<div class="weekly-worker-row">
+          <span class="weekly-worker-name">${esc(w.name)}</span>
+          <div class="weekly-worker-stats">${statsDays}</div>
+          <span class="weekly-worker-pay">${fmt(pay)}</span>
+        </div>`;
+      }).join('');
+
+      return `<div style="border-bottom:1px solid var(--border)">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 15px;background:var(--surface2);border-bottom:1px solid var(--border)">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em">${halfLabel}</span>
+            ${isNow ? '<span class="badge-now">● Now</span>' : ''}
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:.7rem;color:var(--muted)">${(p.workers||[]).length} workers</span>
+            <span style="font-family:'DM Mono',monospace;font-size:.82rem;font-weight:600;color:var(--success)">${fmt(periodTotal)}</span>
+          </div>
+        </div>
+        ${workerRows}
+        <div class="weekly-footer">
+          <span class="weekly-footer-label">Period Total · ${p.label}</span>
+          <span class="weekly-footer-total">${fmt(periodTotal)}</span>
+        </div>
+      </div>`;
+    }).join('');
+
+    const collapseId = 'weekly-collapse-' + mk;
+    return `<div class="weekly-section">
+      <div class="weekly-section-header" onclick="toggleWeeklySection('${collapseId}', this)">
+        <div class="weekly-header-left">
+          <div>
+            <div class="weekly-period-label">${monthName} ${yy}${isCurrentMonth ? ' <span class="badge-now">● Now</span>' : ''}</div>
+            <div class="weekly-date-range">${monthPeriods.map(p=>p.label).join(' · ')}</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="weekly-total">${fmt(monthTotal)}</span>
+          <span class="weekly-badge">${monthPeriods.reduce((s,p)=>s+(p.workers||[]).length,0)} entries</span>
+          <span class="weekly-chevron">▼</span>
+        </div>
+      </div>
+      <div class="weekly-body" id="${collapseId}">
+        ${periodsHtml}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Auto-expand the current month
+  sortedMonthKeys.forEach(mk => {
+    const monthPeriods = monthMap[mk];
+    if (monthPeriods.some(p => p.id === tm.id)) {
+      const el = document.getElementById('weekly-collapse-' + mk);
+      const header = el && el.previousElementSibling;
+      if (el) {
+        el.classList.add('open');
+        const chevron = header && header.querySelector('.weekly-chevron');
+        if (chevron) chevron.classList.add('open');
+      }
+    }
+  });
+}
+
+window.toggleWeeklySection = function(collapseId, headerEl) {
+  const body = document.getElementById(collapseId);
+  if (!body) return;
+  const chevron = headerEl.querySelector('.weekly-chevron');
+  body.classList.toggle('open');
+  if (chevron) chevron.classList.toggle('open');
+};
+
+window.switchHistoryTab = function(tab) {
+  document.getElementById('tab-periods').classList.toggle('active', tab === 'periods');
+  document.getElementById('tab-weekly').classList.toggle('active', tab === 'weekly');
+  document.getElementById('history-periods-panel').style.display = tab === 'periods' ? '' : 'none';
+  document.getElementById('history-weekly-panel').style.display = tab === 'weekly' ? '' : 'none';
+  if (tab === 'weekly') renderWeeklyReport();
+};
+
 function goToPeriod(id) { showView('current'); loadPeriod(id); document.getElementById('period-select').value=id; }
 
 window.gateEdit = function(event, pid, wid, field) {
@@ -965,23 +1305,6 @@ window.gateEdit = function(event, pid, wid, field) {
   }
 };
 
-window.doUpdate = async function(pid, wid, field, value) {
-  if (!isAdmin || !isUnlocked) return;
-  const period = periods.find(p=>p.id===pid);
-  if (!period) return;
-  const worker = (period.workers||[]).find(w=>w.id===wid);
-  if (!worker) return;
-  worker[field] = value;
-  const wtEl = document.getElementById('wt-'+wid);
-  if(wtEl) wtEl.textContent = fmt(calcW(worker));
-  document.getElementById('sum-total').textContent = fmt(calcP(period));
-  setSyncStatus('syncing','Saving…');
-  try {
-    await savePeriod(period);
-    setSyncStatus('ok','Connected · Live sync active');
-  } catch(e) { setSyncStatus('error','Save failed'); }
-};
-
 window.removeWorker = async function(pid, wid) {
   if (!isAdmin || !isUnlocked) return;
   const period = periods.find(p=>p.id===pid);
@@ -989,8 +1312,11 @@ window.removeWorker = async function(pid, wid) {
   const worker = (period.workers||[]).find(w=>w.id===wid);
   if (!worker) return;
   if (!confirm(`Remove "${worker.name}" from this period?\n\nThis cannot be undone.`)) return;
-  // Update local state and re-render immediately
   period.workers = (period.workers||[]).filter(w=>w.id!==wid);
+  // Also remove any pending changes for this worker
+  if (pendingChanges[pid] && pendingChanges[pid].workers) {
+    delete pendingChanges[pid].workers[wid];
+  }
   renderWorkers(period);
   document.getElementById('sum-total').textContent = fmt(calcP(period));
   document.getElementById('sum-workers').textContent = (period.workers||[]).length+' worker'+((period.workers||[]).length!==1?'s':'');
@@ -1008,23 +1334,15 @@ window.setPayType = async function(pid, wid, payType) {
   if (!period) return;
   const worker = (period.workers||[]).find(w=>w.id===wid);
   if (!worker) return;
-
-  // Update local state immediately
   worker.payType = payType;
   if (payType === 'fixed') { worker.days = 0; worker.daysOff = 0; }
-
-  // Re-render immediately from local state (before any network call)
   renderWorkers(period);
   document.getElementById('sum-total').textContent = fmt(calcP(period));
   setSyncStatus('syncing', 'Saving…');
-
-  // Save to Firestore in background (snapshot will be suppressed)
   try {
     await savePeriod(period);
     setSyncStatus('ok', 'Connected · Live sync active');
-  } catch(e) {
-    setSyncStatus('error', 'Save failed');
-  }
+  } catch(e) { setSyncStatus('error', 'Save failed'); }
 };
 
 window.addWorker = function() {
@@ -1063,7 +1381,6 @@ window.saveNewWorker = async function() {
   if (!period.workers) period.workers = [];
   period.workers.unshift(worker);
   closeModal('modal-worker');
-  // Re-render immediately from local state
   renderWorkers(period);
   document.getElementById('sum-total').textContent = fmt(calcP(period));
   document.getElementById('sum-workers').textContent = period.workers.length+' worker'+(period.workers.length!==1?'s':'');
@@ -1118,7 +1435,14 @@ window.submitPw = function() {
 
 window.toggleLock = function() {
   if (!isAdmin) return;
-  if (isUnlocked) setUnlocked(false); else requireUnlock(null);
+  if (isUnlocked) {
+    // If there are unsaved changes, warn first
+    if (hasPending && !confirm('You have unsaved changes. Lock anyway and discard them?')) return;
+    clearPendingChanges();
+    setUnlocked(false);
+  } else {
+    requireUnlock(null);
+  }
 };
 
 function setUnlocked(v) {
@@ -1302,7 +1626,7 @@ window.doExport = function() {
   if(exportFormat==='csv'){
     const blob=new Blob([buildCSV(ps)],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`terragreenoak_${baseName}.csv`;a.click();
   } else {
-    const title=exportScope==='current'?ps[0].label:exportScope==='choose'?(ps.length===1?ps[0].label:`${ps.length} Selected Periods`):'All Pay History';
+    const title=exportScope==='current'?ps[0].label:exportScope==='choose'?(ps.length===1?ps[0].label:`${ps[0].length} Selected Periods`):'All Pay History';
     const win=window.open(URL.createObjectURL(new Blob([buildPDF(ps,title)],{type:'text/html'})),'_blank');
     if(!win){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([buildPDF(ps,title)],{type:'text/html'}));a.download=`terragreenoak_${baseName}.html`;a.click();}
   }
